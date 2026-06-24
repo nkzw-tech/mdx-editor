@@ -1,0 +1,78 @@
+@import url('@radix-ui/colors/blue.css');
+@import url('@radix-ui/colors/blue-dark.css');
+@import url('@radix-ui/colors/slate.css');
+@import url('@radix-ui/colors/slate-dark.css');
+@import url('@radix-ui/colors/grass.css');
+@import url('@radix-ui/colors/cyan.css');
+@import url('@radix-ui/colors/amber.css');
+@import url('@radix-ui/colors/red.css');
+
+.mdxeditor {
+  /** Code mirror */
+  & .cm-editor {
+    --sp-font-mono: var(--font-mono);
+    --sp-font-body: var(--font-body);
+    padding: var(--sp-space-4) 0;
+  }
+
+  & .sp-editor .cm-editor {
+    padding-bottom: 0;
+  }
+
+  & .cm-scroller {
+    padding: 0 !important;
+  }
+
+  & .cm-focused {
+    outline: none;
+  }
+
+  & .sp-wrapper {
+    overflow: hidden;
+  }
+
+  & .sp-layout {
+    border: none;
+  }
+
+  & .sp-cm {
+    & pre {
+      white-space: break-spaces;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      flex-shrink: 1;
+    }
+  }
+
+  /** Diff viewer */
+  & .cm-mergeView .cm-scroller {
+    font-family: var(--font-mono);
+    line-height: 1.3rem;
+    font-size: var(--text-xs);
+  }
+
+  /** Diff viewer */
+  & .cm-sourceView .cm-scroller {
+    font-family: var(--font-mono);
+    line-height: 1.3rem;
+    font-size: var(--text-xs);
+  }
+
+  & .cm-gutters {
+    background: transparent;
+    font-size: var(--text-xxs);
+  }
+
+  & .cm-activeLine {
+    background: transparent;
+  }
+
+  & .cm-tooltip-autocomplete {
+    background: var(--baseBgSubtle);
+  }
+
+
+  hr[data-lexical-decorator=true].selected {
+    outline: 2px solid highlight;
+  }
+}

@@ -1,0 +1,492 @@
+@import './globals.css';
+
+.nkzw-mdx-editor-persistent,
+.nkzw-mdx-editor-shell,
+.nkzw-mdx-editor {
+  --mdx-editor-default-accent: #c56e0e;
+  --mdx-editor-default-accent-soft: rgb(197 110 14 / 0.1);
+  --mdx-editor-default-bg: rgb(255 255 255 / 0.78);
+  --mdx-editor-default-border: rgb(17 17 17 / 0.09);
+  --mdx-editor-default-code-bg: rgb(242 242 242);
+  --mdx-editor-default-hover: rgb(127 127 127 / 0.09);
+  --mdx-editor-default-muted: rgb(17 17 17 / 0.48);
+  --mdx-editor-default-selection: rgb(61 135 245 / 0.1);
+  --mdx-editor-default-table-stripe: rgb(127 127 127 / 0.035);
+  --mdx-editor-default-text: #111;
+  --mdx-editor-accent: var(--mdx-editor-default-accent);
+  --mdx-editor-accent-soft: var(--mdx-editor-default-accent-soft);
+  --mdx-editor-bg: var(--mdx-editor-default-bg);
+  --mdx-editor-border: var(--mdx-editor-default-border);
+  --mdx-editor-code-bg: var(--mdx-editor-default-code-bg);
+  --mdx-editor-font:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    sans-serif;
+  --mdx-editor-font-size: 15px;
+  --mdx-editor-hover: var(--mdx-editor-default-hover);
+  --mdx-editor-line-height: 1.68;
+  --mdx-editor-mono-font: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --mdx-editor-muted: var(--mdx-editor-default-muted);
+  --mdx-editor-padding: 16px;
+  --mdx-editor-radius: 28px;
+  --mdx-editor-selection: var(--mdx-editor-default-selection);
+  --mdx-editor-table-stripe: var(--mdx-editor-default-table-stripe);
+  --mdx-editor-text: var(--mdx-editor-default-text);
+  color: var(--mdx-editor-text);
+  font-family: var(--mdx-editor-font);
+}
+
+.nkzw-mdx-editor-shell[data-color-scheme='dark'],
+.nkzw-mdx-editor.dark-theme {
+  --mdx-editor-default-accent: #eb9a3d;
+  --mdx-editor-default-accent-soft: rgb(235 154 61 / 0.11);
+  --mdx-editor-default-bg: rgb(38 38 38 / 0.72);
+  --mdx-editor-default-border: rgb(230 230 230 / 0.1);
+  --mdx-editor-default-code-bg: rgb(39 39 39);
+  --mdx-editor-default-hover: rgb(127 127 127 / 0.14);
+  --mdx-editor-default-muted: rgb(230 230 230 / 0.48);
+  --mdx-editor-default-selection: rgb(61 135 245 / 0.14);
+  --mdx-editor-default-table-stripe: rgb(255 255 255 / 0.025);
+  --mdx-editor-default-text: rgb(230 230 230);
+}
+
+@media (prefers-color-scheme: dark) {
+  .nkzw-mdx-editor-persistent {
+    --mdx-editor-default-accent: #eb9a3d;
+    --mdx-editor-default-accent-soft: rgb(235 154 61 / 0.11);
+    --mdx-editor-default-bg: rgb(38 38 38 / 0.72);
+    --mdx-editor-default-border: rgb(230 230 230 / 0.1);
+    --mdx-editor-default-code-bg: rgb(39 39 39);
+    --mdx-editor-default-hover: rgb(127 127 127 / 0.14);
+    --mdx-editor-default-muted: rgb(230 230 230 / 0.48);
+    --mdx-editor-default-selection: rgb(61 135 245 / 0.14);
+    --mdx-editor-default-table-stripe: rgb(255 255 255 / 0.025);
+    --mdx-editor-default-text: rgb(230 230 230);
+  }
+}
+
+.nkzw-mdx-editor-shell {
+  width: 100%;
+}
+
+.nkzw-mdx-editor {
+  --baseBase: var(--mdx-editor-bg);
+  --baseBgSubtle: var(--mdx-editor-code-bg);
+  --baseBg: color-mix(in srgb, var(--mdx-editor-bg) 88%, transparent);
+  --baseBgHover: var(--mdx-editor-hover);
+  --baseBgActive: var(--mdx-editor-selection);
+  --baseLine: var(--mdx-editor-border);
+  --baseBorder: var(--mdx-editor-border);
+  --baseBorderHover: color-mix(
+    in srgb,
+    var(--mdx-editor-accent) 45%,
+    var(--mdx-editor-border)
+  );
+  --baseText: var(--mdx-editor-muted);
+  --baseTextContrast: var(--mdx-editor-text);
+  --accentBg: var(--mdx-editor-accent-soft);
+  --accentBgHover: color-mix(
+    in srgb,
+    var(--mdx-editor-accent-soft) 80%,
+    var(--mdx-editor-hover)
+  );
+  --accentBgActive: color-mix(
+    in srgb,
+    var(--mdx-editor-accent-soft) 70%,
+    var(--mdx-editor-selection)
+  );
+  --accentBorder: color-mix(
+    in srgb,
+    var(--mdx-editor-accent) 32%,
+    transparent
+  );
+  --accentSolid: var(--mdx-editor-accent);
+  --accentSolidHover: var(--mdx-editor-accent);
+  --accentText: var(--mdx-editor-accent);
+  --accentTextContrast: var(--mdx-editor-text);
+  color: var(--mdx-editor-text);
+  font-family: var(--mdx-editor-font);
+  width: 100%;
+}
+
+.nkzw-mdx-editor *,
+.nkzw-mdx-editor-notice,
+.nkzw-mdx-editor-notice * {
+  corner-shape: squircle;
+}
+
+.nkzw-mdx-editor-content {
+  caret-color: var(--mdx-editor-accent);
+  color: var(--mdx-editor-text);
+  font-family: var(--mdx-editor-font);
+  outline: none;
+  overflow-wrap: anywhere;
+}
+
+.nkzw-mdx-editor-card .nkzw-mdx-editor-content {
+  background: var(--mdx-editor-bg);
+  border: 1px solid var(--mdx-editor-border);
+  border-radius: var(--mdx-editor-radius);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.35) inset,
+    0 24px 70px -54px rgb(0 0 0 / 0.5);
+  margin: 0 auto;
+  max-width: 980px;
+  padding: var(--mdx-editor-padding);
+}
+
+.nkzw-mdx-editor-plain .nkzw-mdx-editor-content {
+  padding: var(--mdx-editor-padding);
+}
+
+.nkzw-mdx-editor-embedded .nkzw-mdx-editor-content {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  min-height: inherit;
+  padding: var(--mdx-editor-padding);
+}
+
+.nkzw-mdx-editor-content:focus {
+  outline: none;
+}
+
+.nkzw-mdx-editor-content > :first-child {
+  margin-top: 0;
+}
+
+.nkzw-mdx-editor-content > :last-child {
+  margin-bottom: 0;
+}
+
+.nkzw-mdx-editor-content h1,
+.nkzw-mdx-editor-content h2,
+.nkzw-mdx-editor-content h3 {
+  color: var(--mdx-editor-text);
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.nkzw-mdx-editor-document .nkzw-mdx-editor-content h1 {
+  font-size: 32px;
+  line-height: 1.02;
+  margin: 0 0 20px;
+}
+
+.nkzw-mdx-editor-document .nkzw-mdx-editor-content h2 {
+  font-size: 24px;
+  line-height: 1.15;
+  margin: 26px 0 10px;
+}
+
+.nkzw-mdx-editor-document .nkzw-mdx-editor-content h3 {
+  font-size: 17px;
+  margin: 20px 0 8px;
+}
+
+.nkzw-mdx-editor-compact .nkzw-mdx-editor-content h1,
+.nkzw-mdx-editor-compact .nkzw-mdx-editor-content h2,
+.nkzw-mdx-editor-compact .nkzw-mdx-editor-content h3 {
+  font-size: 1em;
+  line-height: inherit;
+  margin: 0.7em 0 0.3em;
+}
+
+.nkzw-mdx-editor-content p,
+.nkzw-mdx-editor-content li {
+  font-size: var(--mdx-editor-font-size);
+  line-height: var(--mdx-editor-line-height);
+  text-wrap: pretty;
+}
+
+.nkzw-mdx-editor-content p {
+  margin: 6px 0;
+}
+
+.nkzw-mdx-editor-compact .nkzw-mdx-editor-content p {
+  margin: 0;
+}
+
+.nkzw-mdx-editor-content strong {
+  color: var(--mdx-editor-text);
+  font-weight: 720;
+}
+
+.nkzw-mdx-editor-content ul,
+.nkzw-mdx-editor-content ol {
+  margin: 6px 0;
+  padding-left: 24px;
+}
+
+.nkzw-mdx-editor-compact .nkzw-mdx-editor-content ul,
+.nkzw-mdx-editor-compact .nkzw-mdx-editor-content ol {
+  margin: 0.25em 0;
+  padding-left: 20px;
+}
+
+.nkzw-mdx-editor-content li {
+  margin: 0;
+  padding-left: 2px;
+}
+
+.nkzw-mdx-editor-content li + li {
+  margin-top: 5px;
+}
+
+.nkzw-mdx-editor-compact .nkzw-mdx-editor-content li + li {
+  margin-top: 2px;
+}
+
+.nkzw-mdx-editor-content li[role='checkbox'] {
+  list-style: none;
+  padding-left: 24px;
+  position: relative;
+}
+
+.nkzw-mdx-editor-content li[role='checkbox']::before {
+  border-radius: 8px;
+  corner-shape: squircle;
+  top: 3.5px;
+}
+
+.nkzw-mdx-editor-content li[role='checkbox'][aria-checked='true']::after {
+  border-width: 0 1.5px 1.5px 0;
+  height: 8px;
+  left: 6px;
+  right: auto;
+  top: 6.5px;
+  width: 4px;
+}
+
+.nkzw-mdx-editor-content li::marker {
+  color: var(--mdx-editor-accent);
+  font-weight: 700;
+}
+
+.nkzw-mdx-editor-content a {
+  color: var(--mdx-editor-accent);
+  font-weight: 620;
+  text-decoration-color: color-mix(
+    in srgb,
+    var(--mdx-editor-accent) 35%,
+    transparent
+  );
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.nkzw-mdx-editor-content a:hover {
+  text-decoration-color: currentColor;
+}
+
+.nkzw-mdx-editor [class*='linkDialogPopoverContent'] {
+  border-color: var(--mdx-editor-border);
+  border-radius: 12px;
+  corner-shape: squircle;
+  gap: 2px;
+  padding: 4px;
+}
+
+.nkzw-mdx-editor-content code {
+  background: var(--mdx-editor-code-bg);
+  border-radius: 7px;
+  corner-shape: squircle;
+  font: 0.88em/1.4 var(--mdx-editor-mono-font);
+  padding: 2px 5px;
+}
+
+.nkzw-mdx-editor-content code > span {
+  background: transparent;
+  padding: 0;
+}
+
+.nkzw-mdx-editor-content pre {
+  background: var(--mdx-editor-code-bg);
+  border: 1px solid var(--mdx-editor-border);
+  border-radius: 17px;
+  corner-shape: squircle;
+  overflow: auto;
+  padding: 18px;
+}
+
+.nkzw-mdx-editor-compact .nkzw-mdx-editor-content pre {
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.nkzw-mdx-editor-content pre code {
+  background: transparent;
+  padding: 0;
+}
+
+.nkzw-mdx-editor-content blockquote {
+  background: var(--mdx-editor-accent-soft);
+  border-left: 3px solid var(--mdx-editor-accent);
+  border-radius: 0 16px 16px 0;
+  color: var(--mdx-editor-text);
+  corner-shape: squircle;
+  margin: 22px 0;
+  padding: 10px 18px;
+}
+
+.nkzw-mdx-editor-compact .nkzw-mdx-editor-content blockquote {
+  margin: 0.5em 0;
+  padding: 5px 10px;
+}
+
+.nkzw-mdx-editor-content hr {
+  border: 0;
+  border-top: 1px solid var(--mdx-editor-border);
+  margin: 12px 0;
+}
+
+.nkzw-mdx-editor-content table {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 12px;
+  margin: 24px 0;
+  width: 100%;
+}
+
+.nkzw-mdx-editor-content th,
+.nkzw-mdx-editor-content td {
+  border-bottom: 1px solid var(--mdx-editor-border);
+  line-height: 1.45;
+  padding: 11px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.nkzw-mdx-editor-content th {
+  background: var(--mdx-editor-code-bg);
+  color: var(--mdx-editor-text);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  position: sticky;
+  text-transform: uppercase;
+  top: -27px;
+}
+
+.nkzw-mdx-editor-content table [data-tool-cell] {
+  background: transparent;
+  border: 0;
+  font-size: inherit;
+  height: 32px;
+  letter-spacing: normal;
+  line-height: 1;
+  padding: 0;
+  position: static;
+  text-align: center;
+  text-transform: none;
+  vertical-align: middle;
+}
+
+.nkzw-mdx-editor-content table colgroup > col:first-child,
+.nkzw-mdx-editor-content table colgroup > col:last-child {
+  width: 26px;
+}
+
+.nkzw-mdx-editor-content tr:nth-child(even) td {
+  background: var(--mdx-editor-table-stripe);
+}
+
+.nkzw-mdx-editor-content input[type='checkbox'] {
+  accent-color: var(--mdx-editor-accent);
+  margin-right: 8px;
+}
+
+.nkzw-mdx-editor .cm-sourceView {
+  background: var(--mdx-editor-bg);
+  border: 1px solid var(--mdx-editor-border);
+  border-radius: var(--mdx-editor-radius);
+  corner-shape: squircle;
+  min-height: min(70vh, 720px);
+  overflow: hidden;
+}
+
+.nkzw-mdx-editor .cm-editor,
+.nkzw-mdx-editor .cm-gutters {
+  background: transparent;
+  color: var(--mdx-editor-text);
+}
+
+.nkzw-mdx-editor .cm-content {
+  caret-color: var(--mdx-editor-accent);
+  font: 13px/1.6 var(--mdx-editor-mono-font);
+  padding: 18px 8px;
+}
+
+.nkzw-mdx-editor .cm-activeLine,
+.nkzw-mdx-editor .cm-activeLineGutter {
+  background: var(--mdx-editor-selection);
+}
+
+.nkzw-mdx-editor-persistent {
+  margin: 0 auto;
+  max-width: 980px;
+  width: 100%;
+}
+
+.nkzw-mdx-editor-notice {
+  align-items: center;
+  background: color-mix(in srgb, var(--mdx-editor-bg) 88%, transparent);
+  border: 1px solid var(--mdx-editor-border);
+  border-radius: 16px;
+  color: var(--mdx-editor-text);
+  corner-shape: squircle;
+  display: flex;
+  font: 13px/1.4 var(--mdx-editor-font);
+  gap: 12px;
+  justify-content: space-between;
+  margin: 0 auto 10px;
+  max-width: 980px;
+  padding: 10px 12px;
+}
+
+.nkzw-mdx-editor-notice[data-kind='conflict'] {
+  border-color: rgb(197 110 14 / 0.38);
+}
+
+.nkzw-mdx-editor-notice[data-kind='error'] {
+  border-color: rgb(199 68 64 / 0.35);
+}
+
+.nkzw-mdx-editor-notice > div {
+  display: flex;
+  gap: 6px;
+}
+
+.nkzw-mdx-editor-notice button {
+  background: transparent;
+  border: 1px solid var(--mdx-editor-border);
+  border-radius: 11px;
+  color: var(--mdx-editor-text);
+  corner-shape: squircle;
+  cursor: pointer;
+  min-height: 30px;
+  padding: 0 10px;
+}
+
+.nkzw-mdx-editor-notice button:hover {
+  background: var(--mdx-editor-hover);
+}
+
+@media (max-width: 780px) {
+  .nkzw-mdx-editor-card .nkzw-mdx-editor-content {
+    --mdx-editor-radius: 22px;
+  }
+
+  .nkzw-mdx-editor-document .nkzw-mdx-editor-content h2 {
+    font-size: 21px;
+  }
+
+  .nkzw-mdx-editor-content table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .nkzw-mdx-editor-notice {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

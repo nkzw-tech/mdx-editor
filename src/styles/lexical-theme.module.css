@@ -1,0 +1,203 @@
+@import url('@radix-ui/colors/blue.css');
+@import url('@radix-ui/colors/blue-dark.css');
+@import url('@radix-ui/colors/slate.css');
+@import url('@radix-ui/colors/slate-dark.css');
+@import url('@radix-ui/colors/grass.css');
+@import url('@radix-ui/colors/cyan.css');
+@import url('@radix-ui/colors/amber.css');
+@import url('@radix-ui/colors/red.css');
+
+.bold {
+  font-weight: bold;
+}
+
+.italic {
+  font-style: italic;
+}
+
+.underline {
+  text-decoration: underline;
+}
+
+.bold {
+  font-weight: 700;
+}
+
+.italic {
+  font-style: italic;
+}
+
+.underline {
+  text-decoration: underline
+}
+
+.strikethrough {
+  text-decoration: line-through
+}
+
+.underlineStrikethrough {
+  text-decoration: underline line-through
+}
+
+.subscript {
+  font-size: .8em;
+  vertical-align: sub !important
+}
+
+.superscript {
+  font-size: .8em;
+  vertical-align: super
+}
+
+.code {
+  background-color: var(--baseBg);
+  padding: 1px .25rem;
+  font-family: var(--font-mono);
+  font-size: 94%
+}
+
+.quote {
+  border-inline-start: 3px solid var(--baseBorder);
+  padding-inline-start: var(--spacing-4);
+  margin-inline-start: 0;
+  color: var(--baseText);
+}
+
+.nestedListItem {
+  list-style: none;
+  list-style-type: none;
+}
+
+.nestedListItem:before,
+.nestedListItem:after {
+  display: none;
+}
+
+.listitem {
+  margin: var(--spacing-2) 0;
+}
+
+.listItemChecked,
+.listItemUnchecked {
+  position: relative;
+  margin-left: 0;
+  margin-right: 0;
+  margin-inline-start: -1rem;
+  padding-left: var(--spacing-6);
+  padding-right: var(--spacing-6);
+  list-style-type: none;
+  outline: none;
+}
+
+.listItemChecked {
+  text-decoration: line-through;
+}
+
+.listItemUnchecked:before,
+.listItemChecked:before {
+  content: '';
+  width: var(--spacing-4);
+  height: var(--spacing-4);
+  top: 0;
+  left: 0;
+  cursor: pointer;
+  display: block;
+  background-size: cover;
+  position: absolute;
+}
+
+.listItemUnchecked[dir='rtl']:before,
+.listItemChecked[dir='rtl']:before {
+  left: auto;
+  right: 0;
+}
+
+.listItemUnchecked:focus:before,
+.listItemChecked:focus:before {
+  box-shadow: 0 0 0 2px var(--accentBgActive);
+  border-radius: var(--radius-small);
+}
+
+.listItemUnchecked:before {
+  border: 1px solid var(--baseBorder);
+  border-radius: var(--radius-small);
+}
+
+.listItemChecked:before {
+  border: 1px solid var(--accentBorder);
+  border-radius: var(--radius-small);
+  background-color: var(--accentSolid);
+  background-repeat: no-repeat;
+}
+
+.listItemChecked:after {
+  content: '';
+  cursor: pointer;
+  border-color: var(--baseBase);
+  border-style: solid;
+  position: absolute;
+  display: block;
+  top: var(--spacing-0_5);
+  width: var(--spacing-1);
+  left: var(--spacing-1_5);
+  right: var(--spacing-1_5);
+  height: var(--spacing-2);
+  transform: rotate(45deg);
+  border-width: 0 var(--spacing-0_5) var(--spacing-0_5) 0;
+}
+
+.nestedListItem {
+  list-style-type: none;
+}
+
+.nestedListItem:before,
+.nestedListItem:after {
+  display: none;
+}
+
+.admonitionDanger,
+.admonitionInfo,
+.admonitionNote,
+.admonitionTip,
+.admonitionCaution {
+  padding: var(--spacing-2);
+  margin-top: var(--spacing-2);
+  margin-bottom: var(--spacing-2);
+  border-left: 3px solid var(--admonitionBorder);
+  background-color: var(--admonitionBg);
+}
+
+.admonitionInfo {
+  --admonitionBorder: var(--admonitionInfoBorder);
+  --admonitionBg: var(--admonitionInfoBg);
+}
+
+.admonitionTip {
+  --admonitionBorder: var(--admonitionTipBorder);
+  --admonitionBg: var(--admonitionTipBg);
+}
+
+.admonitionCaution {
+  --admonitionBorder: var(--admonitionCautionBorder);
+  --admonitionBg: var(--admonitionCautionBg);
+}
+
+.admonitionDanger {
+  --admonitionBorder: var(--admonitionDangerBorder);
+  --admonitionBg: var(--admonitionDangerBg);
+}
+
+.admonitionNote {
+  --admonitionBorder: var(--admonitionNoteBorder);
+  --admonitionBg: var(--admonitionNoteBg);
+}
+
+.mdxExpression {
+  font-family: var(--font-mono);
+  font-size: 84%;
+  color: var(--accentText);
+
+  & input:focus-visible {
+    outline: none;
+  }
+}
