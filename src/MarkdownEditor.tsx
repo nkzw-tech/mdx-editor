@@ -271,7 +271,7 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
 
     useEffect(() => {
       const contentEditable = shellRef.current?.querySelector<HTMLElement>(
-        '.nkzw-mdx-editor-content[contenteditable]'
+        '.mdx-editor-content[contenteditable]'
       )
       if (contentEditable && ariaLabel) {
         contentEditable.setAttribute('aria-label', ariaLabel)
@@ -329,7 +329,7 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
     const handleLinkClick = (event: ReactMouseEvent<HTMLDivElement>) => {
       const target = event.target as HTMLElement
       const anchor = target.closest('a')
-      if (!anchor?.closest('.nkzw-mdx-editor-content')) {
+      if (!anchor?.closest('.mdx-editor-content')) {
         return
       }
       event.preventDefault()
@@ -343,16 +343,16 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
     }
 
     const rootClassName = cx(
-      'nkzw-mdx-editor',
-      `nkzw-mdx-editor-${density}`,
-      `nkzw-mdx-editor-${variant}`,
+      'mdx-editor',
+      `mdx-editor-${density}`,
+      `mdx-editor-${variant}`,
       resolvedColorScheme === 'dark' && 'dark-theme',
       className
     )
 
     return (
       <div
-        className={cx('nkzw-mdx-editor-shell', className)}
+        className={cx('mdx-editor-shell', className)}
         data-color-scheme={resolvedColorScheme}
         data-density={density}
         data-variant={variant}
@@ -366,7 +366,7 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
           autoFocus={autoFocus}
           className={rootClassName}
           contentEditableClassName={cx(
-            'nkzw-mdx-editor-content',
+            'mdx-editor-content',
             contentClassName
           )}
           markdown={initialMarkdownRef.current}

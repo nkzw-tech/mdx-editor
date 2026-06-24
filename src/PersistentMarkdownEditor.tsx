@@ -453,12 +453,12 @@ function PersistentMarkdownEditorInner<Document extends MarkdownDocument>(
   return (
     <div
       className={[
-        'nkzw-mdx-editor-persistent',
+        'mdx-editor-persistent',
         editorProps.className
       ].filter(Boolean).join(' ')}
     >
       {conflictDocument ? (
-        <div className="nkzw-mdx-editor-notice" data-kind="conflict" role="alert">
+        <div className="mdx-editor-notice" data-kind="conflict" role="alert">
           <span>The file on disk changed while you were editing.</span>
           <div>
             <button onClick={useDiskVersion} type="button">
@@ -471,7 +471,7 @@ function PersistentMarkdownEditorInner<Document extends MarkdownDocument>(
         </div>
       ) : null}
       {errorMessage ? (
-        <div className="nkzw-mdx-editor-notice" data-kind="error" role="alert">
+        <div className="mdx-editor-notice" data-kind="error" role="alert">
           <span>{errorMessage}</span>
           <button onClick={() => void flush()} type="button">
             Retry
