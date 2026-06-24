@@ -1,14 +1,7 @@
-import * as Dialog from '@radix-ui/react-dialog'
-import classNames from 'classnames'
-import YamlParser from 'js-yaml'
+import { useCellValue } from '@mdxeditor/gurx'
 import React from 'react'
-import { useFieldArray, useForm } from 'react-hook-form'
-import { frontmatterDialogOpen$, removeFrontmatter$ } from '.'
 import styles from '../../styles/ui.module.css'
-import { editorRootElementRef$, iconComponentFor$, readOnly$, useTranslation } from '../core'
-import { useCellValues, usePublisher } from '@mdxeditor/gurx'
-
-type YamlConfig = { key: string; value: string }[]
+import { readOnly$ } from '../core'
 
 export interface FrontmatterEditorProps {
   yaml: string
@@ -16,154 +9,78 @@ export interface FrontmatterEditorProps {
 }
 
 export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) => {
-  const [readOnly, editorRootElementRef, iconComponentFor, frontmatterDialogOpen] = useCellValues(
-    readOnly$,
-    editorRootElementRef$,
-    iconComponentFor$,
-    frontmatterDialogOpen$
-  )
-  const t = useTranslation()
-  const setFrontmatterDialogOpen = usePublisher(frontmatterDialogOpen$)
-  const removeFrontmatter = usePublisher(removeFrontmatter$)
-  const yamlConfig = React.useMemo<YamlConfig>(() => {
-    if (!yaml) {
-      return []
+  const readOnly = useCellValue(readOnly$)
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null)
+  const wrapperRef = React.useRef<HTMLElement>(null)
+
+  const resizeTextarea = React.useCallback(() => {
+    const textarea = textareaRef.current
+    if (!textarea) {
+      return
     }
-    return Object.entries(YamlParser.load(yaml) as Record<string, string>).map(([key, value]) => ({ key, value }))
-  }, [yaml])
 
-  const { register, control, handleSubmit } = useForm({
-    defaultValues: {
-      yamlConfig
+    textarea.style.height = 'auto'
+    textarea.style.height = `${textarea.scrollHeight}px`
+  }, [])
+
+  React.useLayoutEffect(() => {
+    resizeTextarea()
+    const frame = requestAnimationFrame(resizeTextarea)
+    return () => cancelAnimationFrame(frame)
+  }, [resizeTextarea, yaml])
+
+  React.useEffect(() => {
+    const wrapper = wrapperRef.current
+    const fonts = document.fonts
+    let active = true
+    let width = wrapper?.getBoundingClientRect().width
+    const observer =
+      typeof ResizeObserver !== 'undefined'
+        ? new ResizeObserver(([entry]) => {
+            if (entry && entry.contentRect.width !== width) {
+              width = entry.contentRect.width
+              resizeTextarea()
+            }
+          })
+        : null
+
+    if (wrapper) {
+      observer?.observe(wrapper)
     }
-  })
-
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'yamlConfig'
-  })
-
-  const onSubmit = React.useCallback(
-    ({ yamlConfig }: { yamlConfig: YamlConfig }) => {
-      if (yamlConfig.length === 0) {
-        removeFrontmatter()
-        setFrontmatterDialogOpen(false)
-        return
+    void fonts?.ready.then(() => {
+      if (active) {
+        resizeTextarea()
       }
-      const yaml = yamlConfig.reduce<Record<string, string>>((acc, { key, value }) => {
-        if (key && value) {
-          acc[key] = value
-        }
-        return acc
-      }, {})
-      onChange(YamlParser.dump(yaml).trim())
-      setFrontmatterDialogOpen(false)
-    },
-    [onChange, setFrontmatterDialogOpen, removeFrontmatter]
-  )
+    })
+    fonts?.addEventListener('loadingdone', resizeTextarea)
+
+    return () => {
+      active = false
+      observer?.disconnect()
+      fonts?.removeEventListener('loadingdone', resizeTextarea)
+    }
+  }, [resizeTextarea])
 
   return (
-    <>
-      <Dialog.Root
-        open={frontmatterDialogOpen}
-        onOpenChange={(open) => {
-          setFrontmatterDialogOpen(open)
-        }}
-      >
-        <Dialog.Portal container={editorRootElementRef?.current}>
-          <Dialog.Overlay className={styles.dialogOverlay} />
-          <Dialog.Content className={styles.largeDialogContent} data-editor-type="frontmatter">
-            <Dialog.Title className={styles.dialogTitle}>{t('frontmatterEditor.title', 'Edit document frontmatter')}</Dialog.Title>
-            <form
-              onSubmit={(e) => {
-                void handleSubmit(onSubmit)(e)
-                e.stopPropagation()
-              }}
-              onReset={(e) => {
-                e.stopPropagation()
-                setFrontmatterDialogOpen(false)
-              }}
-            >
-              <table className={styles.propertyEditorTable}>
-                <colgroup>
-                  <col />
-                  <col />
-                  <col />
-                </colgroup>
-                <thead>
-                  <tr>
-                    <th>{t('frontmatterEditor.key', 'Key')}</th>
-                    <th>{t('frontmatterEditor.value', 'Value')}</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {fields.map((item, index) => {
-                    return (
-                      <tr key={item.id}>
-                        <td>
-                          <TableInput {...register(`yamlConfig.${index}.key`, { required: true })} autofocusIfEmpty readOnly={readOnly} />
-                        </td>
-                        <td>
-                          <TableInput {...register(`yamlConfig.${index}.value`, { required: true })} readOnly={readOnly} />
-                        </td>
-                        <td>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              remove(index)
-                            }}
-                            className={styles.iconButton}
-                            disabled={readOnly}
-                          >
-                            {iconComponentFor('delete_big')}
-                          </button>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <td>
-                      <button
-                        disabled={readOnly}
-                        className={classNames(styles.primaryButton, styles.smallButton)}
-                        type="button"
-                        onClick={() => {
-                          append({ key: '', value: '' })
-                        }}
-                      >
-                        {t('frontmatterEditor.addEntry', 'Add entry')}
-                      </button>
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--spacing-2)' }}>
-                <button type="submit" className={styles.primaryButton}>
-                  {t('dialogControls.save', 'Save')}
-                </button>
-                <button type="reset" className={styles.secondaryButton}>
-                  {t('dialogControls.cancel', 'Cancel')}
-                </button>
-              </div>
-            </form>
-            <Dialog.Close asChild>
-              <button className={styles.dialogCloseButton} aria-label={t('dialogControls.cancel', 'Cancel')}>
-                {iconComponentFor('close')}
-              </button>
-            </Dialog.Close>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
-    </>
+    <section
+      className={styles.frontmatterWrapper}
+      data-editor-type="frontmatter"
+      data-read-only={readOnly}
+      ref={wrapperRef}
+    >
+      <div className={styles.frontmatterLabel}>Frontmatter</div>
+      <textarea
+        aria-label="Frontmatter YAML"
+        className={styles.frontmatterEditor}
+        data-autogrow
+        onChange={(event) => onChange(event.target.value)}
+        onKeyDown={(event) => event.stopPropagation()}
+        readOnly={readOnly}
+        ref={textareaRef}
+        rows={1}
+        spellCheck={false}
+        value={yaml}
+      />
+    </section>
   )
 }
-
-const TableInput = React.forwardRef<
-  HTMLInputElement,
-  React.InputHTMLAttributes<HTMLInputElement> & { autofocusIfEmpty?: boolean; autoFocus?: boolean; value?: string }
->(({ className, autofocusIfEmpty: _, ...props }, ref) => {
-  return <input className={classNames(styles.propertyEditorInput, className)} {...props} ref={ref} />
-})

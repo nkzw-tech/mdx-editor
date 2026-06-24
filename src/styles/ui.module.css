@@ -373,7 +373,84 @@
 
 .toolbarCodeBlockLanguageSelectTrigger,
 .toolbarCodeBlockLanguageSelectContent {
-  width: var(--spacing-48);
+  font-family: 'Fira Code', var(--mdx-editor-mono-font);
+}
+
+.toolbarCodeBlockLanguageSelectTrigger {
+  background: color-mix(in srgb, var(--mdx-editor-bg) 72%, transparent);
+  border: 1px solid var(--mdx-editor-border);
+  border-radius: 8px;
+  color: var(--mdx-editor-text);
+  corner-shape: squircle;
+  font-size: 11px;
+  gap: 5px;
+  height: 24px;
+  line-height: 1;
+  margin: 0;
+  min-width: 76px;
+  padding: 0 6px 0 8px;
+  width: auto;
+
+  &[data-state='open'] {
+    border-radius: 8px;
+    filter: none;
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      background: var(--mdx-editor-hover);
+      border-color: color-mix(
+        in srgb,
+        var(--mdx-editor-text) 16%,
+        var(--mdx-editor-border)
+      );
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--mdx-editor-accent) 55%, transparent);
+    outline-offset: 1px;
+  }
+
+  & > span:first-child {
+    display: block;
+    line-height: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.toolbarCodeBlockLanguageSelectContent {
+  background: var(--mdx-editor-popover-bg);
+  border: 1px solid var(--mdx-editor-border);
+  border-radius: 10px;
+  box-shadow:
+    0 10px 28px rgb(0 0 0 / 0.16),
+    0 2px 8px rgb(0 0 0 / 0.08);
+  color: var(--mdx-editor-text);
+  corner-shape: squircle;
+  font-size: 11px;
+  min-width: max(var(--radix-select-trigger-width), 140px);
+  overflow: hidden;
+  padding: 4px;
+  width: auto;
+
+  & .selectItem {
+    border-radius: 6px;
+    corner-shape: squircle;
+    line-height: 1.2;
+    padding: 6px 8px;
+  }
+
+  & .selectItem[data-highlighted] {
+    background: var(--mdx-editor-hover);
+  }
+
+  & .selectItem[data-state='checked'] {
+    background: var(--mdx-editor-selection);
+    color: var(--mdx-editor-text);
+  }
 }
 
 .toolbarNodeKindSelectItem,
@@ -408,6 +485,17 @@
   align-items: center;
 }
 
+.toolbarCodeBlockLanguageSelectTrigger .selectDropdownArrow {
+  flex: 0 0 auto;
+  margin-left: auto;
+
+  & svg {
+    height: 11px;
+    stroke-width: 1.5;
+    width: 11px;
+  }
+}
+
 .contentEditable {
   box-sizing: border-box;
   width: 100%;
@@ -421,11 +509,13 @@
 }
 
 .codeMirrorWrapper {
-  margin-bottom: var(--spacing-5);
-  border: 1px solid var(--baseLine);
-  border-radius: var(--radius-medium);
+  background: var(--mdx-editor-code-bg);
+  border: 1px solid var(--mdx-editor-border);
+  border-radius: 17px;
+  corner-shape: squircle;
+  margin: 18px 0;
   overflow: hidden;
-  padding: 0.8rem;
+  padding: 0;
   position: relative;
 }
 
@@ -442,21 +532,44 @@
 }
 
 .frontmatterWrapper {
-  border-radius: var(--radius-medium);
-  padding: var(--spacing-3);
-  background-color: var(--baseBgSubtle);
-
-  &[data-expanded='true'] {
-    margin-bottom: var(--spacing-10);
-  }
+  background: var(--mdx-editor-code-bg);
+  border: 1px solid var(--mdx-editor-border);
+  border-radius: 12px;
+  box-sizing: border-box;
+  corner-shape: squircle;
+  margin: 0 0 12px;
+  overflow: hidden;
+  width: 100%;
 }
 
-.frontmatterToggleButton {
-  @mixin clear-form-element;
+.frontmatterLabel {
+  border-bottom: 1px solid var(--mdx-editor-border);
+  color: var(--mdx-editor-muted);
   display: flex;
-  align-items: center;
-  gap: var(--spacing-1);
-  font-size: var(--text-sm);
+  font: 600 9px/1 'Fira Code', var(--mdx-editor-mono-font);
+  letter-spacing: 0.06em;
+  padding: 6px 10px 5px;
+  text-transform: uppercase;
+}
+
+.frontmatterEditor {
+  background: transparent;
+  border: 0;
+  box-sizing: border-box;
+  color: var(--mdx-editor-text);
+  display: block;
+  field-sizing: content;
+  font: 12px/1.4 'Fira Code', var(--mdx-editor-mono-font);
+  min-height: calc(1.4em + 15px);
+  outline: 0;
+  overflow: hidden;
+  padding: 7px 10px 8px;
+  resize: none;
+  width: 100%;
+}
+
+.frontmatterWrapper[data-read-only='true'] .frontmatterEditor {
+  cursor: default;
 }
 
 .propertyPanelTitle {

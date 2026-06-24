@@ -23,23 +23,28 @@ export const SelectItem = React.forwardRef<HTMLDivElement | null, { className?: 
 /**
  * @internal
  */
-export const SelectTrigger: React.FC<{ title: string; placeholder: string; className?: string }> = ({ title, placeholder, className }) => {
+export const SelectTrigger: React.FC<{
+  title?: string
+  placeholder: string
+  className?: string
+  showTooltip?: boolean
+}> = ({ title, placeholder, className, showTooltip = true }) => {
   const readOnly = useCellValue(readOnly$)
-  return (
-    <TooltipWrap title={title}>
-      <RadixSelect.Trigger
-        aria-label={placeholder}
-        className={classNames(styles.selectTrigger, className)}
-        data-toolbar-item={true}
-        disabled={readOnly}
-      >
-        <RadixSelect.Value placeholder={placeholder} />
-        <RadixSelect.Icon className={styles.selectDropdownArrow}>
-          <EditorIcon name="chevron-down" />
-        </RadixSelect.Icon>
-      </RadixSelect.Trigger>
-    </TooltipWrap>
+  const trigger = (
+    <RadixSelect.Trigger
+      aria-label={placeholder}
+      className={classNames(styles.selectTrigger, className)}
+      data-toolbar-item={true}
+      disabled={readOnly}
+    >
+      <RadixSelect.Value placeholder={placeholder} />
+      <RadixSelect.Icon className={styles.selectDropdownArrow}>
+        <EditorIcon name="chevron-down" />
+      </RadixSelect.Icon>
+    </RadixSelect.Trigger>
   )
+
+  return showTooltip && title ? <TooltipWrap title={title}>{trigger}</TooltipWrap> : trigger
 }
 
 /**
@@ -96,15 +101,23 @@ export const SelectButtonTrigger: React.FC<{ children: React.ReactNode; title: s
 export const Select = <T extends string>(props: {
   value: T
   onChange: (value: T) => void
-  triggerTitle: string
+  triggerTitle?: string
   placeholder: string
   disabled?: boolean
+  showTooltip?: boolean
+  triggerClassName?: string
+  contentClassName?: string
   items: ({ label: string | JSX.Element; value: T } | 'separator')[]
 }) => {
   return (
     <RadixSelect.Root value={props.value || ''} onValueChange={props.onChange} disabled={props.disabled}>
-      <SelectTrigger title={props.triggerTitle} placeholder={props.placeholder} />
-      <SelectContent>
+      <SelectTrigger
+        className={props.triggerClassName}
+        placeholder={props.placeholder}
+        showTooltip={props.showTooltip}
+        title={props.triggerTitle}
+      />
+      <SelectContent className={props.contentClassName}>
         {props.items.map((item, index) => {
           if (item === 'separator') {
             return <RadixSelect.Separator key={index} />

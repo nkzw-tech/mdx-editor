@@ -38,8 +38,10 @@ export const ChangeCodeMirrorLanguage = () => {
             })
           })
         }}
-        triggerTitle={t('codeBlock.selectLanguage', 'Select code block language')}
+        contentClassName={styles.toolbarCodeBlockLanguageSelectContent}
         placeholder={t('codeBlock.language', 'Code block language')}
+        showTooltip={false}
+        triggerClassName={styles.toolbarCodeBlockLanguageSelectTrigger}
         items={items}
       />
     </div>

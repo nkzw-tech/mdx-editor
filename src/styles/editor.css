@@ -10,6 +10,7 @@
   --mdx-editor-default-code-bg: rgb(242 242 242);
   --mdx-editor-default-hover: rgb(127 127 127 / 0.09);
   --mdx-editor-default-muted: rgb(17 17 17 / 0.48);
+  --mdx-editor-default-popover-bg: #fff;
   --mdx-editor-default-selection: rgb(61 135 245 / 0.1);
   --mdx-editor-default-table-stripe: rgb(127 127 127 / 0.035);
   --mdx-editor-default-text: #111;
@@ -27,6 +28,7 @@
   --mdx-editor-mono-font: ui-monospace, SFMono-Regular, Menlo, monospace;
   --mdx-editor-muted: var(--mdx-editor-default-muted);
   --mdx-editor-padding: 16px;
+  --mdx-editor-popover-bg: var(--mdx-editor-default-popover-bg);
   --mdx-editor-radius: 28px;
   --mdx-editor-selection: var(--mdx-editor-default-selection);
   --mdx-editor-table-stripe: var(--mdx-editor-default-table-stripe);
@@ -44,6 +46,7 @@
   --mdx-editor-default-code-bg: rgb(39 39 39);
   --mdx-editor-default-hover: rgb(127 127 127 / 0.14);
   --mdx-editor-default-muted: rgb(230 230 230 / 0.48);
+  --mdx-editor-default-popover-bg: rgb(38 38 38);
   --mdx-editor-default-selection: rgb(61 135 245 / 0.14);
   --mdx-editor-default-table-stripe: rgb(255 255 255 / 0.025);
   --mdx-editor-default-text: rgb(230 230 230);
@@ -58,6 +61,7 @@
     --mdx-editor-default-code-bg: rgb(39 39 39);
     --mdx-editor-default-hover: rgb(127 127 127 / 0.14);
     --mdx-editor-default-muted: rgb(230 230 230 / 0.48);
+    --mdx-editor-default-popover-bg: rgb(38 38 38);
     --mdx-editor-default-selection: rgb(61 135 245 / 0.14);
     --mdx-editor-default-table-stripe: rgb(255 255 255 / 0.025);
     --mdx-editor-default-text: rgb(230 230 230);
@@ -69,6 +73,7 @@
 }
 
 .mdx-editor {
+  --basePageBg: var(--mdx-editor-popover-bg);
   --baseBase: var(--mdx-editor-bg);
   --baseBgSubtle: var(--mdx-editor-code-bg);
   --baseBg: color-mix(in srgb, var(--mdx-editor-bg) 88%, transparent);
@@ -229,6 +234,22 @@
   padding-left: 2px;
 }
 
+.mdx-editor-content ul {
+  list-style: disc;
+}
+
+.mdx-editor-content ol {
+  list-style: decimal;
+}
+
+.mdx-editor-content ul ul {
+  list-style: circle;
+}
+
+.mdx-editor-content ul ul ul {
+  list-style: square;
+}
+
 .mdx-editor-content li + li {
   margin-top: 5px;
 }
@@ -317,6 +338,42 @@
 .mdx-editor-content pre code {
   background: transparent;
   padding: 0;
+}
+
+.mdx-editor [class*='codeMirrorWrapper'] .cm-editor {
+  background: transparent;
+  color: var(--mdx-editor-text);
+  padding: 0;
+}
+
+.mdx-editor [class*='codeMirrorWrapper'] .cm-scroller {
+  font-family: var(--mdx-editor-mono-font);
+  line-height: 1.55;
+}
+
+.mdx-editor [class*='codeMirrorWrapper'] .cm-content {
+  caret-color: var(--mdx-editor-accent);
+  padding: 16px 18px;
+}
+
+.mdx-editor [class*='codeMirrorWrapper'] .cm-line {
+  padding: 0;
+}
+
+.mdx-editor [class*='codeMirrorWrapper'] .cm-activeLine {
+  background: transparent;
+}
+
+.mdx-editor [class*='codeMirrorWrapper'] [class*='codeMirrorToolbar'] {
+  background: color-mix(in srgb, var(--mdx-editor-code-bg) 88%, transparent);
+  border-bottom-left-radius: 10px;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.mdx-editor [class*='codeMirrorWrapper']:hover [class*='codeMirrorToolbar'],
+.mdx-editor [class*='codeMirrorWrapper']:focus-within [class*='codeMirrorToolbar'] {
+  opacity: 1;
 }
 
 .mdx-editor-content blockquote {

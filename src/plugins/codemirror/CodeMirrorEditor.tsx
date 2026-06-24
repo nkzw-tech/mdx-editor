@@ -8,10 +8,10 @@ import { readOnly$, useTranslation } from '../core'
 
 import { languages } from '@codemirror/language-data'
 import { EditorState, Extension } from '@codemirror/state'
-import { EditorView, lineNumbers, keymap } from '@codemirror/view'
+import { EditorView, keymap } from '@codemirror/view'
 import { indentWithTab } from '@codemirror/commands'
 import { basicLight } from 'cm6-theme-basic-light'
-import { basicSetup } from 'codemirror'
+import { minimalSetup } from 'codemirror'
 import { $setSelection } from 'lexical'
 import {
   EMPTY_VALUE,
@@ -56,9 +56,8 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
     void (async () => {
       const extensions = [
         ...codeMirrorExtensions,
-        basicSetup,
+        minimalSetup,
         basicLight,
-        lineNumbers(),
         keymap.of([indentWithTab]),
         EditorView.lineWrapping,
         EditorView.updateListener.of(({ state }) => {
@@ -126,8 +125,10 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
               })
             })
           }}
-          triggerTitle={t('codeBlock.selectLanguage', 'Select code block language')}
+          contentClassName={styles.toolbarCodeBlockLanguageSelectContent}
           placeholder={t('codeBlock.inlineLanguage', 'Language')}
+          showTooltip={false}
+          triggerClassName={styles.toolbarCodeBlockLanguageSelectTrigger}
           items={selectItems}
         />
         <button
