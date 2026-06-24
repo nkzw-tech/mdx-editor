@@ -1,5 +1,5 @@
 import React from 'react'
-import { act, render } from '@testing-library/react'
+import { act, fireEvent, render, waitFor } from '@testing-library/react'
 import {
   $addUpdateTag,
   $createParagraphNode,
@@ -18,13 +18,19 @@ import {
   UNDO_COMMAND
 } from 'lexical'
 import { $isListItemNode, $isListNode } from '@lexical/list'
-import { describe, expect, test } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 import { MDXEditor, type MDXEditorMethods } from '../MDXEditor'
 import { realmPlugin } from '../RealmWithPlugins'
 import { rootEditor$ } from '../plugins/core'
 import { listsPlugin } from '../plugins/lists'
 import { markdownShortcutPlugin } from '../plugins/markdown-shortcut'
 import { registerCodeBoundaryEscape } from '../registerCodeBoundaryEscape'
+
+const defaultGetComputedStyle = window.getComputedStyle.bind(window)
+
+afterEach(() => {
+  vi.restoreAllMocks()
+})
 
 function createCodeEditor(selectionOffset: number): LexicalEditor {
   const editor = createEditor({
@@ -420,5 +426,122 @@ describe('markdown shortcut editing', () => {
       }
     })
     expect(ref.current?.getMarkdown()).toBe('- second')
+  })
+})
+
+describe('task list pointer interaction', () => {
+  function renderTaskItem() {
+    const changes: string[] = []
+    const rendered = render(
+      <MDXEditor
+        markdown="- [ ] task"
+        onChange={(markdown) => changes.push(markdown)}
+        plugins={[listsPlugin()]}
+        toMarkdownOptions={{ bullet: '-' }}
+      />
+    )
+    const item = rendered.container.querySelector<HTMLElement>(
+      'li[role="checkbox"]'
+    )
+
+    if (!item) {
+      throw new Error('Expected a rendered task list item')
+    }
+    expect(
+      (item.parentNode as HTMLElement & { __lexicalListType?: string })
+        .__lexicalListType
+    ).toBe('check')
+
+    vi.spyOn(item, 'getBoundingClientRect').mockReturnValue({
+      bottom: 24,
+      height: 24,
+      left: 0,
+      right: 100,
+      toJSON: () => ({}),
+      top: 0,
+      width: 100,
+      x: 0,
+      y: 0
+    })
+    vi.spyOn(window, 'getComputedStyle').mockImplementation(
+      (element, pseudoElement) => {
+        if (pseudoElement === '::before') {
+          return { width: '18px' } as CSSStyleDeclaration
+        }
+
+        const styles = defaultGetComputedStyle(element)
+        return new Proxy(styles, {
+          get(target, property, receiver) {
+            if (property === 'getPropertyValue') {
+              return (name: string) =>
+                name === 'zoom' ? '1' : target.getPropertyValue(name)
+            }
+
+            const value = Reflect.get(target, property, receiver)
+            return typeof value === 'function' ? value.bind(target) : value
+          }
+        })
+      }
+    )
+
+    return { changes, item }
+  }
+
+  test('allows two rapid mouse clicks on the same task item', async () => {
+    const { changes, item } = renderTaskItem()
+
+    fireEvent.click(item, { clientX: 8 })
+    await waitFor(() => {
+      expect(changes).toEqual(['- [x] task'])
+      expect(item).toHaveAttribute('aria-checked', 'true')
+    })
+
+    fireEvent.click(item, { clientX: 8 })
+    await waitFor(() => {
+      expect(changes).toEqual(['- [x] task', '- [ ] task'])
+      expect(item).toHaveAttribute('aria-checked', 'false')
+    })
+  })
+
+  test('deduplicates only the synthetic click after a touch toggle', async () => {
+    const { changes, item } = renderTaskItem()
+    const pointerUp = new MouseEvent('pointerup', {
+      bubbles: true,
+      clientX: 8
+    })
+    Object.defineProperty(pointerUp, 'pointerType', { value: 'touch' })
+
+    fireEvent(item, pointerUp)
+    fireEvent.click(item, { clientX: 8 })
+
+    await waitFor(() => {
+      expect(changes).toEqual(['- [x] task'])
+      expect(item).toHaveAttribute('aria-checked', 'true')
+    })
+  })
+
+  test('allows separate rapid touch toggles', async () => {
+    const { changes, item } = renderTaskItem()
+
+    const tap = () => {
+      const pointerUp = new MouseEvent('pointerup', {
+        bubbles: true,
+        clientX: 8
+      })
+      Object.defineProperty(pointerUp, 'pointerType', { value: 'touch' })
+      fireEvent(item, pointerUp)
+    }
+
+    tap()
+    await waitFor(() => {
+      expect(changes).toEqual(['- [x] task'])
+      expect(item).toHaveAttribute('aria-checked', 'true')
+    })
+
+    tap()
+    await waitFor(() => {
+      expect(changes).toEqual(['- [x] task', '- [ ] task'])
+      expect(item).toHaveAttribute('aria-checked', 'false')
+    })
   })
 })

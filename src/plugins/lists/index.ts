@@ -29,7 +29,6 @@ import { $isRootOrShadowRoot, LexicalCommand, RangeSelection } from 'lexical'
 import { $getListDepth, $isListItemNode, $isListNode } from '@lexical/list'
 import { $getSelection, $isElementNode, $isRangeSelection, COMMAND_PRIORITY_CRITICAL, ElementNode, INDENT_CONTENT_COMMAND } from 'lexical'
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin.js'
-import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin.js'
 import { ListPlugin } from '@lexical/react/LexicalListPlugin.js'
 
 import { $findMatchingParent, $getNearestNodeOfType } from '@lexical/utils'
@@ -39,6 +38,7 @@ import { gfmTaskListItemFromMarkdown, gfmTaskListItemToMarkdown } from 'mdast-ut
 import { Cell, Signal, withLatestFrom } from '@mdxeditor/gurx'
 import { realmPlugin } from '../../RealmWithPlugins'
 import { NotesListItemNode } from './NotesListItemNode'
+import { CheckListPlugin } from './CheckListPlugin'
 
 const listItemNodeReplacement = {
   replace: ListItemNode,
