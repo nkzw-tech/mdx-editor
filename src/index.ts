@@ -8,8 +8,16 @@ export {
   type MarkdownEditorProps,
   type MarkdownEditorVariant
 } from './MarkdownEditor'
+export type {
+  MarkdownAnnotation,
+  MarkdownAnnotationAnchor,
+  MarkdownAnnotationBlock,
+  MarkdownAnnotationLayout,
+  MarkdownAnnotationQuote,
+  MarkdownAnnotationRect,
+  MarkdownCommentTarget
+} from './annotations'
 export {
   horizontalRuleOnEnterPlugin,
   registerHorizontalRuleOnEnter
 } from './horizontalRuleShortcut'
-

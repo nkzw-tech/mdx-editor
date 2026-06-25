@@ -72,4 +72,20 @@ describe('MarkdownEditor defaults', () => {
     expect(languageSelect).not.toBeNull()
     expect(languageSelect?.closest('[class*="tooltipTrigger"]')).toBeNull()
   })
+
+  test('can suppress raw HTML processing for untrusted Markdown', () => {
+    const { container } = render(
+      <MarkdownEditor
+        colorScheme="light"
+        defaultValue={
+          '<button onclick="document.body.dataset.probe = \'active\'">Run</button>\n\n<iframe src="https://example.com"></iframe>\n'
+        }
+        readOnly
+        suppressHtmlProcessing
+      />
+    )
+
+    expect(container.querySelector('button[onclick]')).toBeNull()
+    expect(container.querySelector('iframe')).toBeNull()
+  })
 })

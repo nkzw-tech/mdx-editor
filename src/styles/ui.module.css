@@ -383,7 +383,7 @@
   color: var(--mdx-editor-text);
   corner-shape: squircle;
   font-size: 11px;
-  gap: 5px;
+  gap: 4px;
   height: 24px;
   line-height: 1;
   margin: 0;
@@ -424,7 +424,7 @@
 .toolbarCodeBlockLanguageSelectContent {
   background: var(--mdx-editor-popover-bg);
   border: 1px solid var(--mdx-editor-border);
-  border-radius: 10px;
+  border-radius: 8px;
   box-shadow:
     0 10px 28px rgb(0 0 0 / 0.16),
     0 2px 8px rgb(0 0 0 / 0.08);
@@ -511,7 +511,7 @@
 .codeMirrorWrapper {
   background: var(--mdx-editor-code-bg);
   border: 1px solid var(--mdx-editor-border);
-  border-radius: 17px;
+  border-radius: 16px;
   corner-shape: squircle;
   margin: 18px 0;
   overflow: hidden;
@@ -548,7 +548,7 @@
   display: flex;
   font: 600 9px/1 'Fira Code', var(--mdx-editor-mono-font);
   letter-spacing: 0.06em;
-  padding: 6px 10px 5px;
+  padding: 6px 8px 4px;
   text-transform: uppercase;
 }
 
@@ -560,10 +560,10 @@
   display: block;
   field-sizing: content;
   font: 12px/1.4 'Fira Code', var(--mdx-editor-mono-font);
-  min-height: calc(1.4em + 15px);
+  min-height: calc(1.4em + 16px);
   outline: 0;
   overflow: hidden;
-  padding: 7px 10px 8px;
+  padding: 8px;
   resize: none;
   width: 100%;
 }
@@ -935,7 +935,7 @@
   align-items: center;
   background: transparent;
   border: 0;
-  border-radius: 5px;
+  border-radius: 4px;
   box-sizing: border-box;
   color: var(--baseText);
   cursor: pointer;
@@ -1006,7 +1006,7 @@
 }
 
 .tableToolsColumn {
-  width: 26px;
+  width: 24px;
 
   & button {
     margin: auto;
@@ -1087,12 +1087,12 @@
 .addRowButton {
   border-top: 1px solid var(--baseBgActive);
   width: 100%;
-  min-height: 26px;
+  min-height: 24px;
 }
 
 .addColumnButton {
   border-left: 1px solid var(--baseBgActive);
-  width: 26px;
+  width: 24px;
   height: 100%;
 }
 
@@ -1265,8 +1265,8 @@
 
 .imageResizer {
   display: block;
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   position: absolute;
   background-color: var(--accentText);
   border: 1px solid var(--baseBg);

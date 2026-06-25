@@ -56,6 +56,22 @@
   font-size: 94%
 }
 
+.annotationMark {
+  background: var(--mdx-editor-annotation-bg);
+  border-radius: 8px;
+  color: inherit;
+  corner-shape: squircle;
+}
+
+.annotationMark[data-mdx-annotation-active] {
+  background: var(--mdx-editor-annotation-active-bg);
+}
+
+.annotationMarkOverlap {
+  border-radius: 8px;
+  corner-shape: squircle;
+}
+
 .quote {
   border-inline-start: 3px solid var(--baseBorder);
   padding-inline-start: var(--spacing-4);
@@ -133,7 +149,7 @@
 .listItemChecked:after {
   content: '';
   cursor: pointer;
-  border-color: var(--baseBase);
+  border-color: var(--mdx-editor-accent-contrast);
   border-style: solid;
   position: absolute;
   display: block;

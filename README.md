@@ -55,6 +55,26 @@ const adapter: MarkdownPersistenceAdapter<Document> = {
 
 The persistence layer includes debounced saves, a maximum save wait, lifecycle flushing, optimistic concurrency, same-content conflict suppression, disk update reconciliation, and default conflict/error UI.
 
+## Annotations
+
+Hosts can attach repairable block or exact-text annotations without changing the serialized Markdown:
+
+```tsx
+const editorRef = useRef<MarkdownEditorHandle>(null)
+
+<MarkdownEditor
+  activeAnnotationId={activeId}
+  annotations={annotations}
+  onAnnotationAnchorChange={updateAnchor}
+  onAnnotationLayoutChange={updateLayout}
+  onCommentTargetChange={setCommentTarget}
+  ref={editorRef}
+  value={markdown}
+/>
+```
+
+Use `editorRef.current.createAnnotation(id, target)` to capture the current selection or block, `focusAnnotation(id)` to reveal it, and `removeAnnotation(id)` to clear its editor metadata. Persist the returned anchors in the host application. Annotation marks are excluded from Markdown export and repair themselves from structural and quoted-text context after the document is replaced.
+
 ## Styling
 
 Defaults reproduce the original Notes document editor. Override variables on the editor class:
@@ -69,7 +89,7 @@ Defaults reproduce the original Notes document editor. Override variables on the
 }
 ```
 
-The primary variables are `--mdx-editor-bg`, `--mdx-editor-border`, `--mdx-editor-text`, `--mdx-editor-muted`, `--mdx-editor-accent`, `--mdx-editor-accent-soft`, `--mdx-editor-code-bg`, `--mdx-editor-hover`, `--mdx-editor-selection`, `--mdx-editor-table-stripe`, `--mdx-editor-font`, `--mdx-editor-mono-font`, `--mdx-editor-radius`, `--mdx-editor-padding`, `--mdx-editor-font-size`, and `--mdx-editor-line-height`.
+The primary variables are `--mdx-editor-bg`, `--mdx-editor-border`, `--mdx-editor-text`, `--mdx-editor-muted`, `--mdx-editor-accent`, `--mdx-editor-accent-contrast`, `--mdx-editor-accent-soft`, `--mdx-editor-annotation-bg`, `--mdx-editor-annotation-active-bg`, `--mdx-editor-code-bg`, `--mdx-editor-hover`, `--mdx-editor-selection`, `--mdx-editor-table-stripe`, `--mdx-editor-font`, `--mdx-editor-mono-font`, `--mdx-editor-radius`, `--mdx-editor-padding`, `--mdx-editor-font-size`, and `--mdx-editor-line-height`.
 
 ## Advanced API
 

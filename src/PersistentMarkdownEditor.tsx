@@ -320,9 +320,18 @@ function PersistentMarkdownEditorInner<Document extends MarkdownDocument>(
     forwardedRef,
     () => ({
       applyExternalChange,
+      createAnnotation(id, target) {
+        return editorRef.current?.createAnnotation(id, target) ?? null
+      },
       flush,
       focus(options) {
         editorRef.current?.focus(options)
+      },
+      focusAnnotation(id) {
+        editorRef.current?.focusAnnotation(id)
+      },
+      getAnnotationAnchor(id) {
+        return editorRef.current?.getAnnotationAnchor(id) ?? null
       },
       getMarkdown() {
         return editorRef.current?.getMarkdown() ?? sessionRef.current.latestContent
@@ -333,6 +342,9 @@ function PersistentMarkdownEditorInner<Document extends MarkdownDocument>(
       hasUnsavedChanges,
       insertMarkdown(markdown) {
         editorRef.current?.insertMarkdown(markdown)
+      },
+      removeAnnotation(id) {
+        editorRef.current?.removeAnnotation(id)
       },
       setMarkdown(markdown) {
         sessionRef.current.latestContent = markdown

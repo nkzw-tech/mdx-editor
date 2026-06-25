@@ -13,6 +13,12 @@ import {
   useState
 } from 'react'
 import type { ToMarkdownOptions } from './exportMarkdownFromLexical'
+import type {
+  MarkdownAnnotation,
+  MarkdownAnnotationAnchor,
+  MarkdownAnnotationLayout,
+  MarkdownCommentTarget
+} from './annotations'
 import { horizontalRuleOnEnterPlugin } from './horizontalRuleShortcut'
 import {
   MDXEditor,
@@ -49,18 +55,27 @@ export type MarkdownEditorDensity = 'compact' | 'document'
 export type MarkdownEditorVariant = 'card' | 'embedded' | 'plain'
 
 export type MarkdownEditorHandle = {
+  createAnnotation: (
+    id: string,
+    target?: MarkdownCommentTarget | null
+  ) => MarkdownAnnotationAnchor | null
   focus: (options?: {
     defaultSelection?: 'rootStart' | 'rootEnd'
     preventScroll?: boolean
   }) => void
+  focusAnnotation: (id: string) => void
+  getAnnotationAnchor: (id: string) => MarkdownAnnotationAnchor | null
   getMarkdown: () => string
   getSelectionMarkdown: () => string
   insertMarkdown: (markdown: string) => void
+  removeAnnotation: (id: string) => void
   setMarkdown: (markdown: string) => void
 }
 
 export type MarkdownEditorProps = {
+  activeAnnotationId?: string | null
   additionalPlugins?: RealmPlugin[]
+  annotations?: readonly MarkdownAnnotation[]
   ariaLabel?: string
   autoFocus?: boolean | {
     defaultSelection?: 'rootStart' | 'rootEnd'
@@ -72,8 +87,16 @@ export type MarkdownEditorProps = {
   defaultValue?: string
   density?: MarkdownEditorDensity
   minHeight?: number | string
+  onAnnotationAnchorChange?: (
+    id: string,
+    anchor: MarkdownAnnotationAnchor | null
+  ) => void
+  onAnnotationLayoutChange?: (
+    layouts: readonly MarkdownAnnotationLayout[]
+  ) => void
   onBlur?: (event: FocusEvent) => void
   onChange?: (markdown: string) => void
+  onCommentTargetChange?: (target: MarkdownCommentTarget | null) => void
   onError?: (error: Error) => void
   onFocus?: (event: ReactFocusEvent<HTMLDivElement>) => void
   onHeightChange?: (height: number) => void
@@ -85,6 +108,7 @@ export type MarkdownEditorProps = {
   readOnly?: boolean
   resolveLink?: (href: string) => string | null
   spellCheck?: boolean
+  suppressHtmlProcessing?: boolean
   toMarkdownOptions?: ToMarkdownOptions
   value?: string
   variant?: MarkdownEditorVariant
@@ -213,7 +237,9 @@ const createDefaultPlugins = (onClickLink: (href: string) => void) => [
 export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorProps>(
   function MarkdownEditor(
     {
+      activeAnnotationId,
       additionalPlugins = emptyPlugins,
+      annotations = [],
       ariaLabel,
       autoFocus = false,
       className,
@@ -222,8 +248,11 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
       defaultValue = '',
       density = 'document',
       minHeight,
+      onAnnotationAnchorChange,
+      onAnnotationLayoutChange,
       onBlur,
       onChange,
+      onCommentTargetChange,
       onError,
       onFocus,
       onHeightChange,
@@ -235,6 +264,7 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
       readOnly = false,
       resolveLink,
       spellCheck = true,
+      suppressHtmlProcessing = false,
       toMarkdownOptions = canonicalMarkdownOptions,
       value,
       variant = 'card'
@@ -299,8 +329,17 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
     useImperativeHandle(
       forwardedRef,
       () => ({
+        createAnnotation(id, target) {
+          return editorRef.current?.createAnnotation(id, target) ?? null
+        },
         focus(options) {
           editorRef.current?.focus(undefined, options)
+        },
+        focusAnnotation(id) {
+          editorRef.current?.focusAnnotation(id)
+        },
+        getAnnotationAnchor(id) {
+          return editorRef.current?.getAnnotationAnchor(id) ?? null
         },
         getMarkdown() {
           return editorRef.current?.getMarkdown() ?? currentMarkdownRef.current
@@ -310,6 +349,9 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
         },
         insertMarkdown(markdown) {
           editorRef.current?.insertMarkdown(markdown)
+        },
+        removeAnnotation(id) {
+          editorRef.current?.removeAnnotation(id)
         },
         setMarkdown(markdown) {
           currentMarkdownRef.current = markdown
@@ -363,6 +405,8 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
         style={minHeight === undefined ? undefined : { minHeight }}
       >
         <MDXEditor
+          activeAnnotationId={activeAnnotationId}
+          annotations={annotations}
           autoFocus={autoFocus}
           className={rootClassName}
           contentEditableClassName={cx(
@@ -370,8 +414,11 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
             contentClassName
           )}
           markdown={initialMarkdownRef.current}
+          onAnnotationAnchorChange={onAnnotationAnchorChange}
+          onAnnotationLayoutChange={onAnnotationLayoutChange}
           onBlur={onBlur}
           onChange={handleChange}
+          onCommentTargetChange={onCommentTargetChange}
           onError={({ error }) => onError?.(new Error(error))}
           overlayContainer={overlayContainer}
           placeholder={placeholder}
@@ -379,6 +426,7 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
           readOnly={readOnly}
           ref={editorRef}
           spellCheck={spellCheck}
+          suppressHtmlProcessing={suppressHtmlProcessing}
           toMarkdownOptions={toMarkdownOptions}
           trim={false}
         />

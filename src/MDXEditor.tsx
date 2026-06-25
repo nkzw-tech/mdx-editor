@@ -43,6 +43,16 @@ import { lexicalTheme } from './styles/lexicalTheme'
 import styles from './styles/ui.module.css'
 import { noop } from './utils/fp'
 import { getSelectionAsMarkdown } from './utils/lexicalHelpers'
+import {
+  AnnotationController,
+  type MarkdownAnnotationController
+} from './AnnotationController'
+import type {
+  MarkdownAnnotation,
+  MarkdownAnnotationAnchor,
+  MarkdownAnnotationLayout,
+  MarkdownCommentTarget
+} from './annotations'
 
 const LexicalProvider: React.FC<{
   children: JSX.Element | string | (JSX.Element | string)[]
@@ -138,6 +148,15 @@ function defaultTranslation(key: string, defaultValue: string, interpolations = 
  * @group MDXEditor
  */
 export interface MDXEditorMethods {
+  createAnnotation: (
+    id: string,
+    target?: MarkdownCommentTarget | null
+  ) => MarkdownAnnotationAnchor | null
+
+  focusAnnotation: (id: string) => void
+
+  getAnnotationAnchor: (id: string) => MarkdownAnnotationAnchor | null
+
   /**
    * Gets the current markdown value.
    */
@@ -174,6 +193,8 @@ export interface MDXEditorMethods {
    * Returns an empty string if there is no selection, if selection is collapsed, or if editor is in source/diff mode.
    */
   getSelectionMarkdown: () => string
+
+  removeAnnotation: (id: string) => void
 }
 
 const RenderRecursiveWrappers: React.FC<{
@@ -225,13 +246,22 @@ const EditorRootElement: React.FC<{
   )
 }
 
-const Methods: React.FC<{ mdxRef: React.ForwardedRef<MDXEditorMethods> }> = ({ mdxRef }) => {
+const Methods: React.FC<{
+  annotationControllerRef: React.MutableRefObject<MarkdownAnnotationController | null>
+  mdxRef: React.ForwardedRef<MDXEditorMethods>
+}> = ({ annotationControllerRef, mdxRef }) => {
   const realm = useRealm()
 
   React.useImperativeHandle(
     mdxRef,
     () => {
       return {
+        createAnnotation: (id, target) =>
+          annotationControllerRef.current?.createAnnotation(id, target) ?? null,
+        focusAnnotation: (id) =>
+          annotationControllerRef.current?.focusAnnotation(id),
+        getAnnotationAnchor: (id) =>
+          annotationControllerRef.current?.getAnnotationAnchor(id) ?? null,
         getMarkdown: () => {
           const viewMode = realm.getValue(viewMode$)
           if (viewMode === 'source' || viewMode === 'diff') {
@@ -242,6 +272,9 @@ const Methods: React.FC<{ mdxRef: React.ForwardedRef<MDXEditorMethods> }> = ({ m
         },
         setMarkdown: (markdown) => {
           realm.pub(setMarkdown$, markdown)
+          requestAnimationFrame(() =>
+            annotationControllerRef.current?.reconcileAnnotations()
+          )
         },
         insertMarkdown: (markdown) => {
           realm.pub(insertMarkdown$, markdown)
@@ -285,10 +318,12 @@ const Methods: React.FC<{ mdxRef: React.ForwardedRef<MDXEditorMethods> }> = ({ m
             jsxComponentDescriptors,
             jsxIsAvailable
           })
-        }
+        },
+        removeAnnotation: (id) =>
+          annotationControllerRef.current?.removeAnnotation(id)
       }
     },
-    [realm]
+    [annotationControllerRef, realm]
   )
   return null
 }
@@ -298,6 +333,8 @@ const Methods: React.FC<{ mdxRef: React.ForwardedRef<MDXEditorMethods> }> = ({ m
  * @group MDXEditor
  */
 export interface MDXEditorProps {
+  activeAnnotationId?: string | null
+  annotations?: readonly MarkdownAnnotation[]
   /**
    * the CSS class to apply to the content editable element of the editor.
    * Use this to style the various content elements like lists and blockquotes.
@@ -398,6 +435,17 @@ export interface MDXEditorProps {
    * The lexical editor namespace.
    */
   lexicalEditorNamespace?: string
+
+  onAnnotationAnchorChange?: (
+    id: string,
+    anchor: MarkdownAnnotationAnchor | null
+  ) => void
+
+  onAnnotationLayoutChange?: (
+    layouts: readonly MarkdownAnnotationLayout[]
+  ) => void
+
+  onCommentTargetChange?: (target: MarkdownCommentTarget | null) => void
 }
 
 /**
@@ -405,6 +453,8 @@ export interface MDXEditorProps {
  * @group MDXEditor
  */
 export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>((props, ref) => {
+  const annotationControllerRef =
+    React.useRef<MarkdownAnnotationController | null>(null)
   return (
     <RealmWithPlugins
       plugins={[
@@ -434,10 +484,23 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>((pro
     >
       <EditorRootElement className={props.className} overlayContainer={props.overlayContainer}>
         <LexicalProvider>
-          <RichTextEditor />
+          <>
+            <RichTextEditor />
+            <AnnotationController
+              activeAnnotationId={props.activeAnnotationId}
+              annotations={props.annotations ?? []}
+              controllerRef={annotationControllerRef}
+              onAnnotationAnchorChange={props.onAnnotationAnchorChange}
+              onAnnotationLayoutChange={props.onAnnotationLayoutChange}
+              onCommentTargetChange={props.onCommentTargetChange}
+            />
+          </>
         </LexicalProvider>
       </EditorRootElement>
-      <Methods mdxRef={ref} />
+      <Methods
+        annotationControllerRef={annotationControllerRef}
+        mdxRef={ref}
+      />
     </RealmWithPlugins>
   )
 })

@@ -4,7 +4,10 @@
 .mdx-editor-shell,
 .mdx-editor {
   --mdx-editor-default-accent: #c56e0e;
+  --mdx-editor-default-accent-contrast: #fff;
   --mdx-editor-default-accent-soft: rgb(197 110 14 / 0.1);
+  --mdx-editor-default-annotation-active-bg: rgb(235 154 61 / 0.32);
+  --mdx-editor-default-annotation-bg: rgb(235 154 61 / 0.22);
   --mdx-editor-default-bg: rgb(255 255 255 / 0.78);
   --mdx-editor-default-border: rgb(17 17 17 / 0.09);
   --mdx-editor-default-code-bg: rgb(242 242 242);
@@ -15,7 +18,12 @@
   --mdx-editor-default-table-stripe: rgb(127 127 127 / 0.035);
   --mdx-editor-default-text: #111;
   --mdx-editor-accent: var(--mdx-editor-default-accent);
+  --mdx-editor-accent-contrast: var(--mdx-editor-default-accent-contrast);
   --mdx-editor-accent-soft: var(--mdx-editor-default-accent-soft);
+  --mdx-editor-annotation-active-bg: var(
+    --mdx-editor-default-annotation-active-bg
+  );
+  --mdx-editor-annotation-bg: var(--mdx-editor-default-annotation-bg);
   --mdx-editor-bg: var(--mdx-editor-default-bg);
   --mdx-editor-border: var(--mdx-editor-default-border);
   --mdx-editor-code-bg: var(--mdx-editor-default-code-bg);
@@ -70,6 +78,16 @@
 
 .mdx-editor-shell {
   width: 100%;
+}
+
+.mdx-editor-content [data-mdx-annotation-block] {
+  background: var(--mdx-editor-annotation-bg);
+  border-radius: 8px;
+  corner-shape: squircle;
+}
+
+.mdx-editor-content [data-mdx-annotation-block][data-mdx-annotation-active] {
+  background: var(--mdx-editor-annotation-active-bg);
 }
 
 .mdx-editor {
@@ -181,7 +199,7 @@
 .mdx-editor-document .mdx-editor-content h2 {
   font-size: 24px;
   line-height: 1.15;
-  margin: 26px 0 10px;
+  margin: 24px 0 8px;
 }
 
 .mdx-editor-document .mdx-editor-content h3 {
@@ -251,7 +269,7 @@
 }
 
 .mdx-editor-content li + li {
-  margin-top: 5px;
+  margin-top: 4px;
 }
 
 .mdx-editor-compact .mdx-editor-content li + li {
@@ -310,10 +328,10 @@
 
 .mdx-editor-content code {
   background: var(--mdx-editor-code-bg);
-  border-radius: 7px;
+  border-radius: 8px;
   corner-shape: squircle;
   font: 0.88em/1.4 var(--mdx-editor-mono-font);
-  padding: 2px 5px;
+  padding: 2px 4px;
 }
 
 .mdx-editor-content code > span {
@@ -324,15 +342,15 @@
 .mdx-editor-content pre {
   background: var(--mdx-editor-code-bg);
   border: 1px solid var(--mdx-editor-border);
-  border-radius: 17px;
+  border-radius: 16px;
   corner-shape: squircle;
   overflow: auto;
-  padding: 18px;
+  padding: 16px;
 }
 
 .mdx-editor-compact .mdx-editor-content pre {
-  border-radius: 10px;
-  padding: 10px;
+  border-radius: 8px;
+  padding: 8px;
 }
 
 .mdx-editor-content pre code {
@@ -353,7 +371,7 @@
 
 .mdx-editor [class*='codeMirrorWrapper'] .cm-content {
   caret-color: var(--mdx-editor-accent);
-  padding: 16px 18px;
+  padding: 16px;
 }
 
 .mdx-editor [class*='codeMirrorWrapper'] .cm-line {
@@ -366,7 +384,7 @@
 
 .mdx-editor [class*='codeMirrorWrapper'] [class*='codeMirrorToolbar'] {
   background: color-mix(in srgb, var(--mdx-editor-code-bg) 88%, transparent);
-  border-bottom-left-radius: 10px;
+  border-bottom-left-radius: 8px;
   opacity: 0;
   transition: opacity 120ms ease;
 }
@@ -382,13 +400,13 @@
   border-radius: 0 16px 16px 0;
   color: var(--mdx-editor-text);
   corner-shape: squircle;
-  margin: 22px 0;
-  padding: 10px 18px;
+  margin: 20px 0;
+  padding: 8px 16px;
 }
 
 .mdx-editor-compact .mdx-editor-content blockquote {
   margin: 0.5em 0;
-  padding: 5px 10px;
+  padding: 4px 8px;
 }
 
 .mdx-editor-content hr {
@@ -409,7 +427,7 @@
 .mdx-editor-content td {
   border-bottom: 1px solid var(--mdx-editor-border);
   line-height: 1.45;
-  padding: 11px 12px;
+  padding: 12px;
   text-align: left;
   vertical-align: top;
 }
@@ -440,7 +458,7 @@
 
 .mdx-editor-content table colgroup > col:first-child,
 .mdx-editor-content table colgroup > col:last-child {
-  width: 26px;
+  width: 24px;
 }
 
 .mdx-editor-content tr:nth-child(even) td {
@@ -516,7 +534,7 @@
 .mdx-editor-notice button {
   background: transparent;
   border: 1px solid var(--mdx-editor-border);
-  border-radius: 11px;
+  border-radius: 12px;
   color: var(--mdx-editor-text);
   corner-shape: squircle;
   cursor: pointer;

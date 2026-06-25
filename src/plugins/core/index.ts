@@ -36,6 +36,7 @@ import {
 import * as Mdast from 'mdast'
 
 import { gfmStrikethrough } from 'micromark-extension-gfm-strikethrough'
+import { MarkNode } from '@lexical/mark'
 import { gfmStrikethroughFromMarkdown, gfmStrikethroughToMarkdown } from 'mdast-util-gfm-strikethrough'
 import { highlightMarkFromMarkdown, highlightMarkToMarkdown } from 'mdast-util-highlight-mark'
 
@@ -58,6 +59,7 @@ import { noop } from '../../utils/fp'
 import type { JsxComponentDescriptor } from '../jsx'
 import { GenericHTMLNode } from './GenericHTMLNode'
 import { LexicalGenericHTMLVisitor } from './LexicalGenericHTMLNodeVisitor'
+import { LexicalMarkVisitor } from './LexicalMarkVisitor'
 import { LexicalLinebreakVisitor } from './LexicalLinebreakVisitor'
 import { LexicalParagraphVisitor } from './LexicalParagraphVisitor'
 import { LexicalRootVisitor } from './LexicalRootVisitor'
@@ -962,13 +964,14 @@ export const corePlugin = realmPlugin<{
       [initialMarkdown$]: params?.trim ? initialMarkdown.trim() : initialMarkdown,
       [iconComponentFor$]: params?.iconComponentFor,
       [addImportVisitor$]: [MdastRootVisitor, MdastParagraphVisitor, MdastTextVisitor, MdastBreakVisitor, ...formattingVisitors],
-      [addLexicalNode$]: [ParagraphNode, TextNode, GenericHTMLNode],
+      [addLexicalNode$]: [ParagraphNode, TextNode, GenericHTMLNode, MarkNode],
       [addExportVisitor$]: [
         LexicalRootVisitor,
         LexicalParagraphVisitor,
         LexicalTextVisitor,
         LexicalLinebreakVisitor,
-        LexicalGenericHTMLVisitor
+        LexicalGenericHTMLVisitor,
+        LexicalMarkVisitor
       ],
 
       [contentEditableClassName$]: params?.contentEditableClassName,

@@ -2,6 +2,8 @@ import { EditorThemeClasses } from 'lexical'
 import styles from './lexical-theme.module.css'
 
 export const lexicalTheme: EditorThemeClasses = {
+  mark: styles.annotationMark,
+  markOverlap: styles.annotationMarkOverlap,
   quote: styles.quote,
   text: {
     bold: styles.bold,
