@@ -1149,7 +1149,15 @@
 
 .imageWrapper {
   display: inline-block;
+  max-width: 100%;
   position: relative;
+
+  & img,
+  & video {
+    display: block;
+    height: auto;
+    max-width: 100%;
+  }
 }
 
 .imageWrapper[draggable='true'] {

@@ -43,6 +43,19 @@ const BROKEN_IMG_URI =
     </svg>
 `)
 
+const videoExtensions = new Set(['m4v', 'mov', 'mp4', 'ogg', 'ogv', 'webm'])
+
+const getSourceExtension = (src: string) => {
+  const [path] = src.split(/[?#]/, 1)
+  const match = /\.([a-z0-9]+)$/i.exec(path ?? '')
+  return match?.[1]?.toLowerCase() ?? null
+}
+
+const isVideoSource = (src: string) => {
+  const extension = getSourceExtension(src)
+  return extension !== null && videoExtensions.has(extension)
+}
+
 export interface ImageEditorProps {
   nodeKey: string
   src: string
@@ -110,6 +123,35 @@ function LazyImage({
   )
 }
 
+function VideoMedia({
+  title,
+  className,
+  videoRef,
+  src,
+  width,
+  height
+}: {
+  title: string
+  className: string | null
+  videoRef: { current: null | HTMLVideoElement }
+  src: string
+  width: number | 'inherit'
+  height: number | 'inherit'
+}) {
+  return (
+    <video
+      className={className ?? undefined}
+      controls
+      height={height === 'inherit' ? undefined : height}
+      preload="metadata"
+      ref={videoRef}
+      src={src}
+      title={title}
+      width={width === 'inherit' ? undefined : width}
+    />
+  )
+}
+
 export function ImageEditor({ src, title, alt, nodeKey, width, height, rest }: ImageEditorProps): JSX.Element | null {
   const [ImagePlaceholderComponent, disableImageResize, allowSetImageDimensions, imagePreviewHandler, readOnly, EditImageToolbar] =
     useCellValues(
@@ -122,6 +164,7 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height, rest }: I
     )
 
   const imageRef = React.useRef<null | HTMLImageElement>(null)
+  const videoRef = React.useRef<null | HTMLVideoElement>(null)
   const buttonRef = React.useRef<HTMLButtonElement | null>(null)
   const [isSelected, setSelected, clearSelection] = useLexicalNodeSelection(nodeKey)
   const [editor] = useLexicalComposerContext()
@@ -196,11 +239,10 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height, rest }: I
   }, [src, imagePreviewHandler, initialImagePath])
 
   React.useEffect(() => {
-    if (allowSetImageDimensions && imageRef.current) {
-      const { current: image } = imageRef
-
-      syncDimensionWithImageResizer(image, 'width', width)
-      syncDimensionWithImageResizer(image, 'height', height)
+    const media = imageRef.current ?? videoRef.current
+    if (allowSetImageDimensions && media) {
+      syncDimensionWithMedia(media, 'width', width)
+      syncDimensionWithMedia(media, 'height', height)
     }
   }, [allowSetImageDimensions, width, height])
 
@@ -228,7 +270,7 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height, rest }: I
           if (isResizing) {
             return true
           }
-          if (event.target === imageRef.current) {
+          if (event.target === imageRef.current || event.target === videoRef.current) {
             if (event.shiftKey) {
               setSelected(!isSelected)
             } else {
@@ -245,7 +287,7 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height, rest }: I
       editor.registerCommand(
         DRAGSTART_COMMAND,
         (event) => {
-          if (event.target === imageRef.current) {
+          if (event.target === imageRef.current || event.target === videoRef.current) {
             // TODO This is just a temporary workaround for FF to behave like other browsers.
             // Ideally, this handles drag & drop too (and all browsers).
             event.preventDefault()
@@ -286,6 +328,7 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height, rest }: I
 
   const draggable = $isNodeSelection(selection)
   const isFocused = isSelected
+  const renderedAsVideo = imageSource !== null && isVideoSource(imageSource)
 
   const passedClassName = React.useMemo(() => {
     if (rest.length === 0) {
@@ -302,22 +345,38 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height, rest }: I
     <React.Suspense fallback={ImagePlaceholderComponent ? <ImagePlaceholderComponent /> : null}>
       <div className={styles.imageWrapper} data-editor-block-type="image">
         <div draggable={draggable}>
-          <LazyImage
-            width={width}
-            height={height}
-            className={classNames(
-              {
-                [styles.focusedImage]: isFocused
-              },
-              passedClassName
-            )}
-            src={imageSource}
-            title={title ?? ''}
-            alt={alt ?? ''}
-            imageRef={imageRef}
-          />
+          {renderedAsVideo ? (
+            <VideoMedia
+              width={width}
+              height={height}
+              className={classNames(
+                {
+                  [styles.focusedImage]: isFocused
+                },
+                passedClassName
+              )}
+              src={imageSource}
+              title={title ?? alt ?? ''}
+              videoRef={videoRef}
+            />
+          ) : (
+            <LazyImage
+              width={width}
+              height={height}
+              className={classNames(
+                {
+                  [styles.focusedImage]: isFocused
+                },
+                passedClassName
+              )}
+              src={imageSource}
+              title={title ?? ''}
+              alt={alt ?? ''}
+              imageRef={imageRef}
+            />
+          )}
         </div>
-        {draggable && isFocused && !disableImageResize && (
+        {!renderedAsVideo && draggable && isFocused && !disableImageResize && (
           <ImageResizer editor={editor} imageRef={imageRef} onResizeStart={onResizeStart} onResizeEnd={onResizeEnd} />
         )}
         {readOnly || (
@@ -336,10 +395,14 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height, rest }: I
   ) : null
 }
 
-const syncDimensionWithImageResizer = (image: HTMLImageElement, key: 'width' | 'height', value: number | 'inherit') => {
+const syncDimensionWithMedia = (
+  media: HTMLImageElement | HTMLVideoElement,
+  key: 'width' | 'height',
+  value: number | 'inherit'
+) => {
   if (typeof value === 'number') {
-    image.style[key] = `${value}px`
+    media.style[key] = `${value}px`
   } else {
-    image.style.removeProperty(key)
+    media.style.removeProperty(key)
   }
 }

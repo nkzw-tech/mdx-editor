@@ -1,11 +1,49 @@
 import { fireEvent, render, waitFor } from '@testing-library/react'
 import React from 'react'
-import { describe, expect, test, vi } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 import {
   MarkdownEditor,
   type MarkdownEditorHandle
 } from '../MarkdownEditor'
 import { frontmatterPlugin } from '../plugins/frontmatter'
+import { imagePlugin } from '../plugins/image'
+
+afterEach(() => {
+  vi.unstubAllGlobals()
+})
+
+const mockSuccessfulImageLoads = () => {
+  class LoadingImage {
+    alt = ''
+    height = 0
+    onerror: (() => void) | null = null
+    onload: (() => void) | null = null
+    title = ''
+    width = 0
+    private attributes = new Map<string, string>()
+
+    set src(_value: string) {
+      queueMicrotask(() => this.onload?.())
+    }
+
+    get outerHTML() {
+      const attributes = [
+        this.alt ? `alt="${this.alt}"` : null,
+        this.title ? `title="${this.title}"` : null,
+        this.width ? `width="${this.width}"` : null,
+        this.height ? `height="${this.height}"` : null,
+        ...Array.from(this.attributes, ([name, value]) => `${name}="${value}"`)
+      ].filter(Boolean)
+      return `<img${attributes.length > 0 ? ` ${attributes.join(' ')}` : ''}>`
+    }
+
+    setAttribute(name: string, value: string) {
+      this.attributes.set(name, value)
+    }
+  }
+
+  vi.stubGlobal('Image', LoadingImage)
+}
 
 describe('MarkdownEditor defaults', () => {
   test('renders unordered and ordered lists as semantic lists', () => {
@@ -87,6 +125,115 @@ describe('MarkdownEditor defaults', () => {
 
     expect(container.querySelector('button[onclick]')).toBeNull()
     expect(container.querySelector('iframe')).toBeNull()
+  })
+
+  test('renders markdown images by default in read-only mode', async () => {
+    mockSuccessfulImageLoads()
+
+    const { container } = render(
+      <MarkdownEditor
+        colorScheme="light"
+        defaultValue={
+          '![Screenshot](https://gitlab.cfdata.org/uploads/example/screenshot.png)\n'
+        }
+        readOnly
+        suppressHtmlProcessing
+      />
+    )
+
+    await waitFor(() => {
+      expect(container.querySelector('.mdx-editor-content img')).not.toBeNull()
+    })
+    const image = container.querySelector<HTMLImageElement>(
+      '.mdx-editor-content img'
+    )
+    expect(image).toHaveAttribute(
+      'src',
+      'https://gitlab.cfdata.org/uploads/example/screenshot.png'
+    )
+    expect(image).toHaveAttribute('alt', 'Screenshot')
+  })
+
+  test('allows consumers to pass an explicit image plugin', async () => {
+    mockSuccessfulImageLoads()
+
+    const { container } = render(
+      <MarkdownEditor
+        additionalPlugins={[imagePlugin()]}
+        colorScheme="light"
+        defaultValue={
+          '![Screenshot](https://gitlab.cfdata.org/uploads/example/screenshot.png)\n'
+        }
+        readOnly
+        suppressHtmlProcessing
+      />
+    )
+
+    await waitFor(() => {
+      expect(container.querySelector('.mdx-editor-content img')).not.toBeNull()
+    })
+    expect(container.querySelector('.mdx-editor-content img')).toHaveAttribute(
+      'src',
+      'https://gitlab.cfdata.org/uploads/example/screenshot.png'
+    )
+  })
+
+  test('renders GitLab image dimensions without leaking the attribute suffix', async () => {
+    mockSuccessfulImageLoads()
+
+    const { container } = render(
+      <MarkdownEditor
+        colorScheme="light"
+        defaultValue={
+          '![Large image](https://gitlab.cfdata.org/uploads/example/image.png){width=1531 height=800}\n'
+        }
+        readOnly
+        suppressHtmlProcessing
+      />
+    )
+
+    await waitFor(() => {
+      expect(container.querySelector('.mdx-editor-content img')).not.toBeNull()
+    })
+    const image = container.querySelector<HTMLImageElement>(
+      '.mdx-editor-content img'
+    )
+    expect(image).toHaveAttribute(
+      'src',
+      'https://gitlab.cfdata.org/uploads/example/image.png'
+    )
+    expect(image).toHaveAttribute('width', '1531')
+    expect(image).toHaveAttribute('height', '800')
+    expect(container).not.toHaveTextContent('{width=1531 height=800}')
+  })
+
+  test('renders video uploads as controlled video media', async () => {
+    const { container } = render(
+      <MarkdownEditor
+        colorScheme="light"
+        defaultValue={
+          '![Screen recording](https://gitlab.cfdata.org/uploads/example/recording.mov){width=816 height=600}\n'
+        }
+        readOnly
+        suppressHtmlProcessing
+      />
+    )
+
+    await waitFor(() => {
+      expect(container.querySelector('.mdx-editor-content video')).not.toBeNull()
+    })
+    const video = container.querySelector<HTMLVideoElement>(
+      '.mdx-editor-content video'
+    )
+    expect(container.querySelector('.mdx-editor-content img')).toBeNull()
+    expect(video).toHaveAttribute('controls')
+    expect(video).toHaveAttribute(
+      'src',
+      'https://gitlab.cfdata.org/uploads/example/recording.mov'
+    )
+    expect(video).toHaveAttribute('width', '816')
+    expect(video).toHaveAttribute('height', '600')
+    expect(container).not.toHaveTextContent('{width=816 height=600}')
   })
 
   test('does not mark read-only table data columns as tool columns', () => {

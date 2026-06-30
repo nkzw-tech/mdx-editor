@@ -27,6 +27,7 @@ import {
 import { codeBlockPlugin } from './plugins/codeblock'
 import { codeMirrorPlugin } from './plugins/codemirror'
 import { headingsPlugin } from './plugins/headings'
+import { imagePlugin } from './plugins/image'
 import { linkDialogPlugin } from './plugins/link-dialog'
 import { linkPlugin } from './plugins/link'
 import { listsPlugin } from './plugins/lists'
@@ -49,6 +50,72 @@ const emptyPlugins: RealmPlugin[] = []
 
 const cx = (...classes: Array<string | false | null | undefined>) =>
   classes.filter(Boolean).join(' ')
+
+const imageWithAttributePattern =
+  /!\[([^\]\n]*(?:\\.[^\]\n]*)*)\]\(([^)\n]+)\)\{([^}\n]+)\}/g
+const imageAttributePattern =
+  /(?:^|\s)(width|height)\s*=\s*(?:"([^"]+)"|'([^']+)'|([^\s}]+))/gi
+
+const escapeHtmlAttribute = (value: string) =>
+  value
+    .replaceAll('&', '&amp;')
+    .replaceAll('"', '&quot;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+
+const parseImageDestination = (value: string) => {
+  const trimmed = value.trim()
+  if (trimmed.startsWith('<')) {
+    const end = trimmed.indexOf('>')
+    return end > 0
+      ? {
+          src: trimmed.slice(1, end),
+          title: trimmed.slice(end + 1).trim() || undefined
+        }
+      : { src: trimmed }
+  }
+
+  const match = /^(\S+)(?:\s+("([^"]*)"|'([^']*)'))?\s*$/.exec(trimmed)
+  return {
+    src: match?.[1] ?? trimmed,
+    title: match?.[3] ?? match?.[4]
+  }
+}
+
+const normalizeMarkdownImageAttributes = (markdown: string) =>
+  markdown.replaceAll(
+    imageWithAttributePattern,
+    (match, altText: string, destination: string, attributes: string) => {
+      const dimensions: Record<'height' | 'width', string | undefined> = {
+        height: undefined,
+        width: undefined
+      }
+      let attributeMatch: RegExpExecArray | null
+      imageAttributePattern.lastIndex = 0
+      while ((attributeMatch = imageAttributePattern.exec(attributes))) {
+        const key = attributeMatch[1]?.toLowerCase()
+        if (key === 'height' || key === 'width') {
+          dimensions[key] =
+            attributeMatch[2] ?? attributeMatch[3] ?? attributeMatch[4]
+        }
+      }
+      if (!dimensions.height && !dimensions.width) {
+        return match
+      }
+
+      const { src, title } = parseImageDestination(destination)
+      const htmlAttributes = [
+        `src="${escapeHtmlAttribute(src)}"`,
+        `alt="${escapeHtmlAttribute(altText.replaceAll('\\]', ']'))}"`,
+        title ? `title="${escapeHtmlAttribute(title)}"` : null,
+        dimensions.width ? `width="${escapeHtmlAttribute(dimensions.width)}"` : null,
+        dimensions.height
+          ? `height="${escapeHtmlAttribute(dimensions.height)}"`
+          : null
+      ].filter(Boolean)
+      return `<img ${htmlAttributes.join(' ')} />`
+    }
+  )
 
 export type MarkdownEditorColorScheme = 'dark' | 'inherit' | 'light' | 'system'
 export type MarkdownEditorDensity = 'compact' | 'document'
@@ -202,10 +269,14 @@ const openHref = (
   }
 }
 
-const createDefaultPlugins = (onClickLink: (href: string) => void) => [
+const createDefaultPlugins = (
+  onClickLink: (href: string) => void,
+  readOnly: boolean
+) => [
   headingsPlugin(),
   listsPlugin(),
   quotePlugin(),
+  ...(readOnly ? [imagePlugin()] : []),
   linkPlugin(),
   linkDialogPlugin({
     onClickLinkCallback: onClickLink
@@ -271,7 +342,9 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
     },
     forwardedRef
   ) {
-    const initialMarkdownRef = useRef(value ?? defaultValue)
+    const initialMarkdownRef = useRef(
+      normalizeMarkdownImageAttributes(value ?? defaultValue)
+    )
     const currentMarkdownRef = useRef(initialMarkdownRef.current)
     const editorRef = useRef<MDXEditorMethods>(null)
     const shellRef = useRef<HTMLDivElement>(null)
@@ -285,18 +358,25 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
 
     const plugins = useMemo(
       () => [
-        ...createDefaultPlugins((href) => openHref(href, handlersRef.current)),
+        ...createDefaultPlugins(
+          (href) => openHref(href, handlersRef.current),
+          readOnly
+        ),
         ...additionalPlugins
       ],
-      [additionalPlugins]
+      [additionalPlugins, readOnly]
     )
 
     useEffect(() => {
-      if (value === undefined || value === currentMarkdownRef.current) {
+      if (value === undefined) {
         return
       }
-      currentMarkdownRef.current = value
-      editorRef.current?.setMarkdown(value)
+      const normalizedValue = normalizeMarkdownImageAttributes(value)
+      if (normalizedValue === currentMarkdownRef.current) {
+        return
+      }
+      currentMarkdownRef.current = normalizedValue
+      editorRef.current?.setMarkdown(normalizedValue)
     }, [value])
 
     useEffect(() => {
@@ -348,14 +428,17 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
           return editorRef.current?.getSelectionMarkdown() ?? ''
         },
         insertMarkdown(markdown) {
-          editorRef.current?.insertMarkdown(markdown)
+          editorRef.current?.insertMarkdown(
+            normalizeMarkdownImageAttributes(markdown)
+          )
         },
         removeAnnotation(id) {
           editorRef.current?.removeAnnotation(id)
         },
         setMarkdown(markdown) {
-          currentMarkdownRef.current = markdown
-          editorRef.current?.setMarkdown(markdown)
+          const normalizedMarkdown = normalizeMarkdownImageAttributes(markdown)
+          currentMarkdownRef.current = normalizedMarkdown
+          editorRef.current?.setMarkdown(normalizedMarkdown)
         }
       }),
       []
