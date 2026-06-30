@@ -88,4 +88,33 @@ describe('MarkdownEditor defaults', () => {
     expect(container.querySelector('button[onclick]')).toBeNull()
     expect(container.querySelector('iframe')).toBeNull()
   })
+
+  test('does not mark read-only table data columns as tool columns', () => {
+    const tableMarkdown =
+      '| Status | Description | Result |\n| --- | --- | --- |\n| Pass | Uses a readable table layout | Good |\n'
+    const editable = render(<MarkdownEditor colorScheme="light" defaultValue={tableMarkdown} />)
+    expect(
+      editable.container.querySelectorAll('.mdx-editor-content table col[data-tool-column]')
+    ).toHaveLength(2)
+    expect(editable.container.querySelector('.mdx-editor-shell')).not.toHaveAttribute(
+      'data-read-only'
+    )
+    editable.unmount()
+
+    const { container } = render(
+      <MarkdownEditor
+        colorScheme="light"
+        defaultValue={tableMarkdown}
+        readOnly
+      />
+    )
+
+    const columns = container.querySelectorAll('.mdx-editor-content table colgroup > col')
+    expect(columns).toHaveLength(3)
+    expect(container.querySelector('.mdx-editor-shell')).toHaveAttribute(
+      'data-read-only',
+      'true'
+    )
+    expect(container.querySelector('.mdx-editor-content table col[data-tool-column]')).toBeNull()
+  })
 })

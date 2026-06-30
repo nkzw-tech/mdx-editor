@@ -195,7 +195,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
       }}
     >
       <colgroup>
-        {readOnly ? null : <col />}
+        {readOnly ? null : <col data-tool-column={true} />}
 
         {Array.from({ length: mdastNode.children[0].children.length }, (_, colIndex) => {
           const align = mdastNode.align ?? []
@@ -204,7 +204,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
           return <col key={colIndex} className={className} />
         })}
 
-        {readOnly ? null : <col />}
+        {readOnly ? null : <col data-tool-column={true} />}
       </colgroup>
 
       {readOnly || (

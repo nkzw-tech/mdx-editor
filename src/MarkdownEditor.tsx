@@ -397,6 +397,7 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
         className={cx('mdx-editor-shell', className)}
         data-color-scheme={resolvedColorScheme}
         data-density={density}
+        data-read-only={readOnly ? 'true' : undefined}
         data-variant={variant}
         onClickCapture={handleLinkClick}
         onFocusCapture={onFocus}
