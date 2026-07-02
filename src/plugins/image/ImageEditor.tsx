@@ -43,6 +43,8 @@ const BROKEN_IMG_URI =
     </svg>
 `)
 
+const imageLoadRetryDelays = [250, 750, 1500, 3000]
+
 const videoExtensions = new Set(['m4v', 'mov', 'mp4', 'ogg', 'ogv', 'webm'])
 
 const getSourceExtension = (src: string) => {
@@ -69,16 +71,30 @@ export interface ImageEditorProps {
 // https://css-tricks.com/pre-caching-image-with-react-suspense/
 const imgCache = {
   __cache: {} as Record<string, string | Promise<void>>,
+  __retryCount: {} as Record<string, number>,
   read(src: string) {
     if (!this.__cache[src]) {
       this.__cache[src] = new Promise<void>((resolve) => {
         const img = new Image()
         img.onerror = () => {
-          this.__cache[src] = BROKEN_IMG_URI
-          resolve()
+          const retryCount = this.__retryCount[src] ?? 0
+          const retryDelay = imageLoadRetryDelays[retryCount]
+
+          if (retryDelay === undefined) {
+            this.__cache[src] = BROKEN_IMG_URI
+            resolve()
+            return
+          }
+
+          this.__retryCount[src] = retryCount + 1
+          window.setTimeout(() => {
+            delete this.__cache[src]
+            resolve()
+          }, retryDelay)
         }
         img.onload = () => {
           this.__cache[src] = src
+          delete this.__retryCount[src]
           resolve()
         }
         img.src = src

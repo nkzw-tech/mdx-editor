@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-deprecated */
 import { ImagePlaceholder } from '@/plugins/image/ImagePlaceholder'
 import { $wrapNodeInElement, mergeRegister } from '@lexical/utils'
-import { JSX } from 'react'
-import { Action, Cell, Signal, map, mapTo, withLatestFrom } from '@mdxeditor/gurx'
+import React, { JSX } from 'react'
+import { Action, Cell, Realm, Signal, map, mapTo, useCellValues, usePublisher, withLatestFrom } from '@mdxeditor/gurx'
 import {
   $createParagraphNode,
   $createRangeSelection,
@@ -32,13 +32,16 @@ import {
   addExportVisitor$,
   addImportVisitor$,
   addLexicalNode$,
-  createActiveEditorSubscription$
+  createActiveEditorSubscription$,
+  editorRootElementRef$,
+  readOnly$
 } from '../core'
 import { EditImageToolbar, EditImageToolbarProps } from './EditImageToolbar'
 import { ImageDialog } from './ImageDialog'
 import { $createImageNode, $isImageNode, CreateImageNodeParameters, ImageNode } from './ImageNode'
 import { LexicalImageVisitor } from './LexicalImageVisitor'
 import { MdastHtmlImageVisitor, MdastImageVisitor, MdastJsxImageVisitor } from './MdastImageVisitor'
+import styles from '../../styles/ui.module.css'
 
 export * from './ImageNode'
 
@@ -140,11 +143,13 @@ export const insertImage$ = Signal<InsertImageParameters>((r) => {
     }
 
     if ('file' in values) {
-      imageUploadHandler?.(values.file)
-        .then(handler)
-        .catch((e: unknown) => {
-          throw e
-        })
+      if (imageUploadHandler) {
+        uploadImage(r, imageUploadHandler, values.file)
+          .then(handler)
+          .catch((e: unknown) => {
+            throw e
+          })
+      }
     } else {
       handler(values.src)
     }
@@ -179,6 +184,94 @@ export const imagePreviewHandler$ = Cell<ImagePreviewHandler>(null)
  * @group Image
  */
 export const imagePlaceholder$ = Cell<typeof ImagePlaceholder | null>(null)
+
+/**
+ * Tracks active image uploads.
+ * @group Image
+ */
+export const imageUploadCount$ = Cell<number>(0)
+
+/**
+ * Tracks whether the editor is a file drop target for an image upload.
+ * @group Image
+ */
+export const imageDragOver$ = Cell<boolean>(false)
+
+const imageUploadPreviousReadOnly$ = Cell<boolean | null>(null)
+
+const beginImageUpload = (r: Realm) => {
+  const uploadCount = r.getValue(imageUploadCount$)
+  if (uploadCount === 0) {
+    r.pub(imageUploadPreviousReadOnly$, r.getValue(readOnly$))
+    r.pub(readOnly$, true)
+  }
+  r.pub(imageDragOver$, false)
+  r.pub(imageUploadCount$, uploadCount + 1)
+}
+
+const finishImageUpload = (r: Realm) => {
+  const uploadCount = Math.max(0, r.getValue(imageUploadCount$) - 1)
+  r.pub(imageUploadCount$, uploadCount)
+  if (uploadCount === 0) {
+    const previousReadOnly = r.getValue(imageUploadPreviousReadOnly$)
+    r.pub(readOnly$, previousReadOnly ?? false)
+    r.pub(imageUploadPreviousReadOnly$, null)
+  }
+}
+
+const uploadImage = (r: Realm, imageUploadHandler: NonNullable<ImageUploadHandler>, file: File) => {
+  beginImageUpload(r)
+  return imageUploadHandler(file).finally(() => finishImageUpload(r))
+}
+
+const ImageUploadOverlay: React.FC = () => {
+  const [uploadCount, imageDragOver, editorRootElementRef] = useCellValues(
+    imageUploadCount$,
+    imageDragOver$,
+    editorRootElementRef$
+  )
+  const setImageDragOver = usePublisher(imageDragOver$)
+
+  React.useEffect(() => {
+    const editorRootElement = editorRootElementRef?.current
+    if (!editorRootElement || typeof window === 'undefined') {
+      return
+    }
+
+    const clearDragOver = () => setImageDragOver(false)
+    const handleDragLeave = (event: DragEvent) => {
+      const relatedTarget = event.relatedTarget
+      if (relatedTarget instanceof Node && editorRootElement.contains(relatedTarget)) {
+        return
+      }
+      clearDragOver()
+    }
+
+    editorRootElement.addEventListener('dragleave', handleDragLeave)
+    window.addEventListener('dragend', clearDragOver)
+    window.addEventListener('drop', clearDragOver)
+    return () => {
+      editorRootElement.removeEventListener('dragleave', handleDragLeave)
+      window.removeEventListener('dragend', clearDragOver)
+      window.removeEventListener('drop', clearDragOver)
+    }
+  }, [editorRootElementRef, setImageDragOver])
+
+  if (uploadCount <= 0 && !imageDragOver) {
+    return null
+  }
+
+  const uploading = uploadCount > 0
+  return React.createElement(
+    'div',
+    {
+      className: styles.imageUploadOverlay,
+      'data-drop': !uploading && imageDragOver ? 'true' : undefined,
+      role: 'status'
+    },
+    uploading ? 'Thinking…' : 'Drop image'
+  )
+}
 
 /**
  * Holds the current state of the image dialog.
@@ -216,11 +309,13 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
               }
 
         if (values.file && values.file.length > 0) {
-          imageUploadHandler?.(values.file.item(0)!)
-            .then(handler)
-            .catch((e: unknown) => {
-              throw e
-            })
+          if (imageUploadHandler) {
+            uploadImage(r, imageUploadHandler, values.file.item(0)!)
+              .then(handler)
+              .catch((e: unknown) => {
+                throw e
+              })
+          }
         } else if (values.src) {
           handler(values.src)
         }
@@ -253,7 +348,7 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
         editor.registerCommand<DragEvent>(
           DRAGOVER_COMMAND,
           (event) => {
-            return onDragover(event, !!theUploadHandler)
+            return onDragover(event, !!r.getValue(imageUploadHandler$), (dragOver) => r.pub(imageDragOver$, dragOver))
           },
           COMMAND_PRIORITY_LOW
         ),
@@ -261,7 +356,7 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
         editor.registerCommand<DragEvent>(
           DROP_COMMAND,
           (event) => {
-            return onDrop(event, editor, r.getValue(imageUploadHandler$))
+            return onDrop(event, editor, r.getValue(imageUploadHandler$), r)
           },
           COMMAND_PRIORITY_HIGH
         ),
@@ -288,7 +383,7 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
 
             const imageUploadHandlerValue = r.getValue(imageUploadHandler$)!
 
-            Promise.all(cbPayload.map((file) => imageUploadHandlerValue(file.getAsFile()!)))
+            Promise.all(cbPayload.map((file) => uploadImage(r, imageUploadHandlerValue, file.getAsFile()!)))
               .then((urls) => {
                 urls.forEach((url) => {
                   editor.dispatchCommand(INSERT_IMAGE_COMMAND, {
@@ -387,7 +482,7 @@ export const imagePlugin = realmPlugin<{
       [addImportVisitor$]: [MdastImageVisitor, MdastHtmlImageVisitor, MdastJsxImageVisitor],
       [addLexicalNode$]: ImageNode,
       [addExportVisitor$]: LexicalImageVisitor,
-      [addComposerChild$]: params?.ImageDialog ?? ImageDialog,
+      [addComposerChild$]: [params?.ImageDialog ?? ImageDialog, ImageUploadOverlay],
       [imageUploadHandler$]: params?.imageUploadHandler ?? null,
       [imageAutocompleteSuggestions$]: params?.imageAutocompleteSuggestions ?? [],
       [disableImageResize$]: Boolean(params?.disableImageResize),
@@ -453,13 +548,14 @@ function onDragStart(event: DragEvent): boolean {
   return true
 }
 
-function onDragover(event: DragEvent, hasUploadHandler: boolean): boolean {
+function onDragover(event: DragEvent, hasUploadHandler: boolean, setImageDragOver: (dragOver: boolean) => void): boolean {
   if (hasUploadHandler) {
     // test if the user is dragging a file from the explorer
     let cbPayload = Array.from(event.dataTransfer?.items ?? [])
     cbPayload = cbPayload.filter((i) => i.type.includes('image')) // Strip out the non-image bits
 
     if (cbPayload.length > 0) {
+      setImageDragOver(true)
       event.preventDefault()
       return true
     }
@@ -477,7 +573,8 @@ function onDragover(event: DragEvent, hasUploadHandler: boolean): boolean {
   return true
 }
 
-function onDrop(event: DragEvent, editor: LexicalEditor, imageUploadHandler: ImageUploadHandler): boolean {
+function onDrop(event: DragEvent, editor: LexicalEditor, imageUploadHandler: ImageUploadHandler, r: Realm): boolean {
+  r.pub(imageDragOver$, false)
   let cbPayload = Array.from(event.dataTransfer?.items ?? [])
   cbPayload = cbPayload.filter((i) => i.type.includes('image')) // Strip out the non-image bits
 
@@ -491,7 +588,7 @@ function onDrop(event: DragEvent, editor: LexicalEditor, imageUploadHandler: Ima
               image.getAsString(rs)
             })
           }
-          return imageUploadHandler(image.getAsFile()!)
+          return uploadImage(r, imageUploadHandler, image.getAsFile()!)
         })
       )
         .then((urls) => {
