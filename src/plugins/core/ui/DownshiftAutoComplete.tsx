@@ -1,23 +1,33 @@
 import { useCombobox } from 'downshift'
 import React from 'react'
-import { Control, UseFormSetValue, Controller, UseFormRegister } from 'react-hook-form'
+import {
+  Control,
+  Controller,
+  FieldPathByValue,
+  FieldPathValue,
+  FieldValues,
+  UseFormRegister,
+  UseFormSetValue
+} from 'react-hook-form'
 import { EditorIcon } from '../../../EditorIcon'
 import styles from '../../../styles/ui.module.css'
 
 const MAX_SUGGESTIONS = 20
 
-interface DownshiftAutoCompleteProps {
+interface DownshiftAutoCompleteProps<TFieldValues extends FieldValues> {
   suggestions: string[]
-  control: Control<any>
-  setValue: UseFormSetValue<any>
-  register: UseFormRegister<any>
+  control: Control<TFieldValues>
+  setValue: UseFormSetValue<TFieldValues>
+  register: UseFormRegister<TFieldValues>
   placeholder: string
-  inputName: string
+  inputName: FieldPathByValue<TFieldValues, string>
   autofocus?: boolean
   initialInputValue: string
 }
 
-export const DownshiftAutoComplete: React.FC<DownshiftAutoCompleteProps> = (props) => {
+export function DownshiftAutoComplete<TFieldValues extends FieldValues>(
+  props: DownshiftAutoCompleteProps<TFieldValues>
+) {
   if (props.suggestions.length > 0) {
     return <DownshiftAutoCompleteWithSuggestions {...props} />
   } else {
@@ -25,7 +35,7 @@ export const DownshiftAutoComplete: React.FC<DownshiftAutoCompleteProps> = (prop
   }
 }
 
-export const DownshiftAutoCompleteWithSuggestions: React.FC<DownshiftAutoCompleteProps> = ({
+export function DownshiftAutoCompleteWithSuggestions<TFieldValues extends FieldValues>({
   autofocus,
   suggestions,
   control,
@@ -33,7 +43,7 @@ export const DownshiftAutoCompleteWithSuggestions: React.FC<DownshiftAutoComplet
   placeholder,
   initialInputValue,
   setValue
-}) => {
+}: DownshiftAutoCompleteProps<TFieldValues>) {
   const [items, setItems] = React.useState(suggestions.slice(0, MAX_SUGGESTIONS))
 
   const enableAutoComplete = suggestions.length > 0
@@ -41,7 +51,10 @@ export const DownshiftAutoCompleteWithSuggestions: React.FC<DownshiftAutoComplet
   const { isOpen, getToggleButtonProps, getMenuProps, getInputProps, highlightedIndex, getItemProps, selectedItem } = useCombobox({
     initialInputValue,
     onInputValueChange({ inputValue = '' }) {
-      setValue(inputName, inputValue)
+      setValue(
+        inputName,
+        inputValue as FieldPathValue<TFieldValues, FieldPathByValue<TFieldValues, string>>
+      )
       inputValue = inputValue.toLowerCase() || ''
       const matchingItems = []
       for (const suggestion of suggestions) {

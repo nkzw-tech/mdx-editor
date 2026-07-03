@@ -6,7 +6,6 @@ import postcssMixins from 'postcss-mixins'
 import { defineConfig } from 'vite'
 import dts from 'vite-plugin-dts'
 import svgr from 'vite-plugin-svgr'
-import tsconfigPaths from 'vite-tsconfig-paths'
 
 const ext = {
   cjs: 'cjs',
@@ -42,9 +41,11 @@ export default defineConfig({
         svgo: true,
         replaceAttrValues: { 'black': 'currentColor' }
       }
-    }),
-    tsconfigPaths()
+    })
   ],
+  resolve: {
+    tsconfigPaths: true
+  },
   build: {
     minify: false,
     cssMinify: false,

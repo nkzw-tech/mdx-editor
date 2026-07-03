@@ -136,7 +136,7 @@ const DialogForm: React.FC<{
     onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => {
       onKeyDownEH(e)
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      downshiftInputProps.onKeyDown(e)
+      downshiftInputProps.onKeyDown?.(e)
     }
   }
 

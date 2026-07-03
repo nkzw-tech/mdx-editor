@@ -6,7 +6,7 @@
  */
 
 import type { ListItemNode } from '@lexical/list'
-import type { LexicalEditor } from 'lexical'
+import type { ElementNode, LexicalEditor } from 'lexical'
 
 import {
   $insertList,
@@ -366,7 +366,7 @@ function findCheckListItemSibling(
   let sibling = backward
     ? node.getPreviousSibling()
     : node.getNextSibling()
-  let parent: ListItemNode | null = node
+  let parent: ElementNode | null = node
 
   while (sibling === null && $isListItemNode(parent)) {
     parent = parent.getParentOrThrow().getParent()
