@@ -65,7 +65,7 @@ export const ImageDialog: React.FC = () => {
             e.preventDefault()
           }}
         >
-          <Dialog.Title>{t('uploadImage.dialogTitle', 'Upload an image')}</Dialog.Title>
+          <Dialog.Title>{t('uploadImage.dialogTitle', 'Upload an image or video')}</Dialog.Title>
           <form
             onSubmit={async (e) => {
               e.preventDefault()
@@ -76,19 +76,21 @@ export const ImageDialog: React.FC = () => {
             className={styles.multiFieldForm}
           >
             {imageUploadHandler === null ? (
-              <input type="hidden" accept="image/*" {...register('file')} />
+              <input type="hidden" accept="image/*,video/*" {...register('file')} />
             ) : (
               <div className={styles.formField}>
-                <label htmlFor="file">{t('uploadImage.uploadInstructions', 'Upload an image from your device:')}</label>
-                <input type="file" accept="image/*" {...register('file')} />
+                <label htmlFor="file">
+                  {t('uploadImage.uploadInstructions', 'Upload an image or video from your device:')}
+                </label>
+                <input type="file" accept="image/*,video/*" {...register('file')} />
               </div>
             )}
 
             <div className={styles.formField}>
               <label htmlFor="src">
                 {imageUploadHandler !== null
-                  ? t('uploadImage.addViaUrlInstructions', 'Or add an image from an URL:')
-                  : t('uploadImage.addViaUrlInstructionsNoUpload', 'Add an image from an URL:')}
+                  ? t('uploadImage.addViaUrlInstructions', 'Or add an image or video from a URL:')
+                  : t('uploadImage.addViaUrlInstructionsNoUpload', 'Add an image or video from a URL:')}
               </label>
               <DownshiftAutoComplete
                 register={register}

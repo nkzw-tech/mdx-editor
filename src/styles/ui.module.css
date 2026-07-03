@@ -1324,6 +1324,7 @@
   font-style: normal;
   font-weight: 700;
   inset: var(--spacing-2);
+  pointer-events: none;
 }
 
 .inlineEditor {

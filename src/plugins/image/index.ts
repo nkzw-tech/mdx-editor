@@ -267,9 +267,10 @@ const ImageUploadOverlay: React.FC = () => {
     {
       className: styles.imageUploadOverlay,
       'data-drop': !uploading && imageDragOver ? 'true' : undefined,
-      role: 'status'
+      role: 'status',
+      style: !uploading && imageDragOver ? { pointerEvents: 'none' } : undefined
     },
-    uploading ? 'Thinking…' : 'Drop image'
+    uploading ? 'Thinking…' : 'Drop images or videos'
   )
 }
 
@@ -550,9 +551,7 @@ function onDragStart(event: DragEvent): boolean {
 
 function onDragover(event: DragEvent, hasUploadHandler: boolean, setImageDragOver: (dragOver: boolean) => void): boolean {
   if (hasUploadHandler) {
-    // test if the user is dragging a file from the explorer
-    let cbPayload = Array.from(event.dataTransfer?.items ?? [])
-    cbPayload = cbPayload.filter((i) => i.type.includes('image')) // Strip out the non-image bits
+    const cbPayload = Array.from(event.dataTransfer?.items ?? []).filter(isImageOrVideoItem)
 
     if (cbPayload.length > 0) {
       setImageDragOver(true)
@@ -575,8 +574,7 @@ function onDragover(event: DragEvent, hasUploadHandler: boolean, setImageDragOve
 
 function onDrop(event: DragEvent, editor: LexicalEditor, imageUploadHandler: ImageUploadHandler, r: Realm): boolean {
   r.pub(imageDragOver$, false)
-  let cbPayload = Array.from(event.dataTransfer?.items ?? [])
-  cbPayload = cbPayload.filter((i) => i.type.includes('image')) // Strip out the non-image bits
+  const cbPayload = Array.from(event.dataTransfer?.items ?? []).filter(isImageOrVideoItem)
 
   if (cbPayload.length > 0) {
     if (imageUploadHandler !== null) {
@@ -630,6 +628,9 @@ function onDrop(event: DragEvent, editor: LexicalEditor, imageUploadHandler: Ima
   }
   return true
 }
+
+const isImageOrVideoItem = (item: DataTransferItem) =>
+  item.type.startsWith('image/') || item.type.startsWith('video/')
 
 function getImageNodeInSelection(): ImageNode | null {
   const selection = $getSelection()

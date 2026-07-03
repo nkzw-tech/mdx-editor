@@ -1,4 +1,4 @@
-import { fireEvent, render, waitFor } from '@testing-library/react'
+import { createEvent, fireEvent, render, waitFor } from '@testing-library/react'
 import React from 'react'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import {
@@ -234,6 +234,61 @@ describe('MarkdownEditor defaults', () => {
     expect(video).toHaveAttribute('width', '816')
     expect(video).toHaveAttribute('height', '600')
     expect(container).not.toHaveTextContent('{width=816 height=600}')
+  })
+
+  test('uploads dropped images and videos without allowing browser navigation', async () => {
+    mockSuccessfulImageLoads()
+
+    const editorRef = React.createRef<MarkdownEditorHandle>()
+    const image = new File(['image'], 'screenshot.png', { type: 'image/png' })
+    const video = new File(['video'], 'recording.mov', { type: 'video/quicktime' })
+    const imageUploadHandler = vi.fn((file: File) =>
+      Promise.resolve(`https://gitlab.cfdata.org/uploads/example/${file.name}`)
+    )
+    const dataTransfer = {
+      items: [
+        {
+          getAsFile: () => image,
+          kind: 'file',
+          type: image.type
+        },
+        {
+          getAsFile: () => video,
+          kind: 'file',
+          type: video.type
+        }
+      ]
+    }
+    const { container, getByRole } = render(
+      <MarkdownEditor
+        additionalPlugins={[imagePlugin({ imageUploadHandler })]}
+        colorScheme="light"
+        defaultValue=""
+        ref={editorRef}
+      />
+    )
+    const editor = container.querySelector<HTMLElement>('[contenteditable="true"]')!
+    const dragOver = createEvent.dragOver(editor, { dataTransfer })
+    fireEvent(editor, dragOver)
+
+    expect(dragOver.defaultPrevented).toBe(true)
+    const overlay = getByRole('status')
+    expect(overlay).toHaveTextContent('Drop images or videos')
+    expect(getComputedStyle(overlay).pointerEvents).toBe('none')
+
+    const drop = createEvent.drop(editor, { dataTransfer })
+    fireEvent(editor, drop)
+
+    expect(drop.defaultPrevented).toBe(true)
+    await waitFor(() => {
+      expect(imageUploadHandler).toHaveBeenCalledTimes(2)
+      expect(editorRef.current?.getMarkdown()).toContain(
+        'https://gitlab.cfdata.org/uploads/example/screenshot.png'
+      )
+      expect(editorRef.current?.getMarkdown()).toContain(
+        'https://gitlab.cfdata.org/uploads/example/recording.mov'
+      )
+    })
   })
 
   test('does not mark read-only table data columns as tool columns', () => {
