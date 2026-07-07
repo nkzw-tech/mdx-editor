@@ -30,95 +30,95 @@
  */
 export * from '@mdxeditor/gurx'
 // editor component
-export * from './MDXEditor'
-export * from './defaultSvgIcons'
+export * from './MDXEditor.js'
+export * from './defaultSvgIcons.js'
 
 // import/export
-export * from './importMarkdownToLexical'
-export * from './exportMarkdownFromLexical'
+export * from './importMarkdownToLexical.js'
+export * from './exportMarkdownFromLexical.js'
 
 // core so that you can build your own plugins
-export * from './plugins/core'
+export * from './plugins/core/index.js'
 
 // basics
-export * from './plugins/headings'
-export * from './plugins/thematic-break'
-export * from './plugins/lists'
-export * from './plugins/table'
-export * from './plugins/link'
-export * from './plugins/image'
-export * from './plugins/frontmatter'
-export * from './plugins/quote'
-export * from './plugins/maxlength'
+export * from './plugins/headings/index.js'
+export * from './plugins/thematic-break/index.js'
+export * from './plugins/lists/index.js'
+export * from './plugins/table/index.js'
+export * from './plugins/link/index.js'
+export * from './plugins/image/index.js'
+export * from './plugins/frontmatter/index.js'
+export * from './plugins/quote/index.js'
+export * from './plugins/maxlength/index.js'
 
 // JSX
-export * from './plugins/jsx'
-export * from './jsx-editors/GenericJsxEditor'
+export * from './plugins/jsx/index.js'
+export * from './jsx-editors/GenericJsxEditor.js'
 
 // code blocks
-export * from './plugins/codemirror'
-export * from './plugins/codemirror/CodeMirrorEditor'
-export * from './plugins/codeblock'
+export * from './plugins/codemirror/index.js'
+export * from './plugins/codemirror/CodeMirrorEditor.js'
+export * from './plugins/codeblock/index.js'
 
 // directives
-export * from './plugins/directives'
-export * from './directive-editors/AdmonitionDirectiveDescriptor'
-export * from './directive-editors/GenericDirectiveEditor'
+export * from './plugins/directives/index.js'
+export * from './directive-editors/AdmonitionDirectiveDescriptor.js'
+export * from './directive-editors/GenericDirectiveEditor.js'
 
 // UI
-export * from './plugins/link-dialog'
+export * from './plugins/link-dialog/index.js'
 
-export * from './plugins/toolbar'
+export * from './plugins/toolbar/index.js'
 
-export * from './plugins/diff-source'
-export * from './plugins/markdown-shortcut'
+export * from './plugins/diff-source/index.js'
+export * from './plugins/markdown-shortcut/index.js'
 
-export * from './plugins/search'
+export * from './plugins/search/index.js'
 
 // Toolbar components
-export * from './plugins/toolbar/components/BlockTypeSelect'
-export * from './plugins/toolbar/components/BoldItalicUnderlineToggles'
-export * from './plugins/toolbar/components/ChangeAdmonitionType'
-export * from './plugins/toolbar/components/ChangeCodeMirrorLanguage'
-export * from './plugins/toolbar/components/CodeToggle'
-export * from './plugins/toolbar/components/HighlightToggle'
-export * from './plugins/toolbar/components/CreateLink'
-export * from './plugins/toolbar/components/DiffSourceToggleWrapper'
-export * from './plugins/toolbar/components/InsertAdmonition'
-export * from './plugins/toolbar/components/InsertCodeBlock'
-export * from './plugins/toolbar/components/InsertFrontmatter'
-export * from './plugins/toolbar/components/InsertImage'
-export * from './plugins/toolbar/components/InsertTable'
-export * from './plugins/toolbar/components/InsertThematicBreak'
-export * from './plugins/toolbar/components/ListsToggle'
-export * from './plugins/toolbar/components/UndoRedo'
-export * from './plugins/toolbar/components/KitchenSinkToolbar'
+export * from './plugins/toolbar/components/BlockTypeSelect.js'
+export * from './plugins/toolbar/components/BoldItalicUnderlineToggles.js'
+export * from './plugins/toolbar/components/ChangeAdmonitionType.js'
+export * from './plugins/toolbar/components/ChangeCodeMirrorLanguage.js'
+export * from './plugins/toolbar/components/CodeToggle.js'
+export * from './plugins/toolbar/components/HighlightToggle.js'
+export * from './plugins/toolbar/components/CreateLink.js'
+export * from './plugins/toolbar/components/DiffSourceToggleWrapper.js'
+export * from './plugins/toolbar/components/InsertAdmonition.js'
+export * from './plugins/toolbar/components/InsertCodeBlock.js'
+export * from './plugins/toolbar/components/InsertFrontmatter.js'
+export * from './plugins/toolbar/components/InsertImage.js'
+export * from './plugins/toolbar/components/InsertTable.js'
+export * from './plugins/toolbar/components/InsertThematicBreak.js'
+export * from './plugins/toolbar/components/ListsToggle.js'
+export * from './plugins/toolbar/components/UndoRedo.js'
+export * from './plugins/toolbar/components/KitchenSinkToolbar.js'
 
 // Build your own toolbar items
-export * from './plugins/toolbar/primitives/toolbar'
-export * from './plugins/toolbar/primitives/DialogButton'
-export * from './plugins/toolbar/primitives/TooltipWrap'
-export * from './plugins/toolbar/primitives/select'
+export * from './plugins/toolbar/primitives/toolbar.js'
+export * from './plugins/toolbar/primitives/DialogButton.js'
+export * from './plugins/toolbar/primitives/TooltipWrap.js'
+export * from './plugins/toolbar/primitives/select.js'
 
 // Build your own editor
-export * from './plugins/core/NestedLexicalEditor'
-export * from './plugins/core/PropertyPopover'
-export * from './plugins/remote'
+export * from './plugins/core/NestedLexicalEditor.js'
+export * from './plugins/core/PropertyPopover.js'
+export * from './plugins/remote/index.js'
 
 // Helpers & utilities
-export * from './utils/detectMac'
-export * from './utils/fp'
-export * from './utils/isPartOftheEditorUI'
-export * from './utils/lexicalHelpers'
-export * from './utils/makeHslTransparent'
-export * from './utils/uuid4'
-export * from './utils/voidEmitter'
+export * from './utils/detectMac.js'
+export * from './utils/fp.js'
+export * from './utils/isPartOftheEditorUI.js'
+export * from './utils/lexicalHelpers.js'
+export * from './utils/makeHslTransparent.js'
+export * from './utils/uuid4.js'
+export * from './utils/voidEmitter.js'
 
-export * from './RealmWithPlugins'
+export * from './RealmWithPlugins.js'
 
-export * from './FormatConstants'
+export * from './FormatConstants.js'
 
-export * from './styles/lexicalTheme'
+export * from './styles/lexicalTheme.js'
 
 import * as lexical from 'lexical'
 export { lexical }

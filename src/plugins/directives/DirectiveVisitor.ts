@@ -1,6 +1,6 @@
 import { LeafDirective } from 'mdast-util-directive'
-import { LexicalExportVisitor } from '../../exportMarkdownFromLexical'
-import { $isDirectiveNode, DirectiveNode } from './DirectiveNode'
+import { LexicalExportVisitor } from '../../exportMarkdownFromLexical.js'
+import { $isDirectiveNode, DirectiveNode } from './DirectiveNode.js'
 
 export const DirectiveVisitor: LexicalExportVisitor<DirectiveNode, LeafDirective> = {
   testLexicalNode: $isDirectiveNode,

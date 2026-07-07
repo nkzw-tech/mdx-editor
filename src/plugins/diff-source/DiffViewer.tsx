@@ -1,12 +1,12 @@
 import React from 'react'
 
-import { cmExtensions$, diffMarkdown$, readOnlyDiff$ } from '.'
-import { markdown$, markdownSourceEditorValue$, onBlur$, readOnly$ } from '../core'
+import { cmExtensions$, diffMarkdown$, readOnlyDiff$ } from './index.js'
+import { markdown$, markdownSourceEditorValue$, onBlur$, readOnly$ } from '../core/index.js'
 
 import { MergeView } from '@codemirror/merge'
 import { EditorState } from '@codemirror/state'
 import { EditorView } from '@codemirror/view'
-import { COMMON_STATE_CONFIG_EXTENSIONS } from './SourceEditor'
+import { COMMON_STATE_CONFIG_EXTENSIONS } from './SourceEditor.js'
 import { useCellValue, useCellValues, usePublisher, useRealm } from '@mdxeditor/gurx'
 
 function setContent(view: EditorView | undefined, content: string) {

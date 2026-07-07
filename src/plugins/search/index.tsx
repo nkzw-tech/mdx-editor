@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { Cell, debounceTime, useCell, useCellValue, useRealm } from '@mdxeditor/gurx'
 import { $createRangeSelection, $getNearestNodeFromDOMNode, $isTextNode, getNearestEditorFromDOMNode } from 'lexical'
-import { realmPlugin } from '../../RealmWithPlugins'
-import { contentEditableRef$, createRootEditorSubscription$ } from '../core'
+import { realmPlugin } from '../../RealmWithPlugins.js'
+import { contentEditableRef$, createRootEditorSubscription$ } from '../core/index.js'
 
 export const EmptyTextNodeIndex: TextNodeIndex = {
   allText: '',

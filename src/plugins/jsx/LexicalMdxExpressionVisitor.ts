@@ -1,6 +1,6 @@
 import { MdxFlowExpression, MdxTextExpression } from 'mdast-util-mdx'
-import { LexicalExportVisitor } from '../../exportMarkdownFromLexical'
-import { $isLexicalMdxExpressionNode, LexicalMdxExpressionNode } from './LexicalMdxExpressionNode'
+import { LexicalExportVisitor } from '../../exportMarkdownFromLexical.js'
+import { $isLexicalMdxExpressionNode, LexicalMdxExpressionNode } from './LexicalMdxExpressionNode.js'
 
 export const LexicalMdxExpressionVisitor: LexicalExportVisitor<LexicalMdxExpressionNode, MdxTextExpression> = {
   testLexicalNode: $isLexicalMdxExpressionNode,

@@ -2,9 +2,9 @@ import { mergeRegister } from '@lexical/utils'
 import { useCellValues } from '@mdxeditor/gurx'
 import { CAN_REDO_COMMAND, CAN_UNDO_COMMAND, COMMAND_PRIORITY_CRITICAL, REDO_COMMAND, UNDO_COMMAND } from 'lexical'
 import React from 'react'
-import { IS_APPLE } from '../../../utils/detectMac'
-import { activeEditor$, iconComponentFor$, useTranslation } from '../../core'
-import { MultipleChoiceToggleGroup } from '.././primitives/toolbar'
+import { IS_APPLE } from '../../../utils/detectMac.js'
+import { activeEditor$, iconComponentFor$, useTranslation } from '../../core/index.js'
+import { MultipleChoiceToggleGroup } from '.././primitives/toolbar.js'
 
 /**
  * A toolbar component that lets the user undo and redo changes in the editor.

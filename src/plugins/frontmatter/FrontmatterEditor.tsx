@@ -1,7 +1,7 @@
 import { useCellValue } from '@mdxeditor/gurx'
 import React from 'react'
 import styles from '../../styles/ui.module.css'
-import { readOnly$ } from '../core'
+import { readOnly$ } from '../core/index.js'
 
 export interface FrontmatterEditorProps {
   yaml: string

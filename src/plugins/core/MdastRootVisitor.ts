@@ -1,5 +1,5 @@
 import * as Mdast from 'mdast'
-import { MdastImportVisitor } from '../../importMarkdownToLexical'
+import { MdastImportVisitor } from '../../importMarkdownToLexical.js'
 
 export const MdastRootVisitor: MdastImportVisitor<Mdast.Root> = {
   testNode: 'root',

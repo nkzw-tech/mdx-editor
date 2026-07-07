@@ -1,10 +1,10 @@
 import React from 'react'
-import { ButtonWithTooltip } from '.././primitives/toolbar'
-import { hasFrontmatter$, insertFrontmatter$ } from '../../frontmatter'
+import { ButtonWithTooltip } from '.././primitives/toolbar.js'
+import { hasFrontmatter$, insertFrontmatter$ } from '../../frontmatter/index.js'
 import styles from '../../../styles/ui.module.css'
 import classNames from 'classnames'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
-import { iconComponentFor$, useTranslation } from '../../core'
+import { iconComponentFor$, useTranslation } from '../../core/index.js'
 
 /**
  * A toolbar button that allows the user to insert a {@link https://jekyllrb.com/docs/front-matter/ | front-matter} editor (if one is not already present).

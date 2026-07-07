@@ -1,8 +1,8 @@
 import React from 'react'
-import { insertThematicBreak$ } from '../../thematic-break'
-import { ButtonWithTooltip } from '.././primitives/toolbar'
+import { insertThematicBreak$ } from '../../thematic-break/index.js'
+import { ButtonWithTooltip } from '.././primitives/toolbar.js'
 import { useCellValue, usePublisher } from '@mdxeditor/gurx'
-import { iconComponentFor$, useTranslation } from '../../core'
+import { iconComponentFor$, useTranslation } from '../../core/index.js'
 
 /**
  * A toolbar button that allows the user to insert a thematic break (rendered as an HR HTML element).

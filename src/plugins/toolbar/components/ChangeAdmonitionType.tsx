@@ -1,9 +1,9 @@
 import { AdmonitionKind } from 'lexical'
 import React from 'react'
-import { Translation, editorInFocus$, rootEditor$, useTranslation } from '../../core'
-import { Select } from '.././primitives/select'
-import { DirectiveNode } from '../../directives/DirectiveNode'
-import { ADMONITION_TYPES } from '../../../directive-editors/AdmonitionDirectiveDescriptor'
+import { Translation, editorInFocus$, rootEditor$, useTranslation } from '../../core/index.js'
+import { Select } from '.././primitives/select.js'
+import { DirectiveNode } from '../../directives/DirectiveNode.js'
+import { ADMONITION_TYPES } from '../../../directive-editors/AdmonitionDirectiveDescriptor.js'
 import { useCellValues } from '@mdxeditor/gurx'
 
 export function admonitionLabelsMap(t: Translation): Record<(typeof ADMONITION_TYPES)[number], string> {

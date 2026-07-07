@@ -5,9 +5,9 @@ import React from 'react'
 
 import classNames from 'classnames'
 import { useCombobox } from 'downshift'
-import { editorRootElementRef$, iconComponentFor$, readOnly$, useTranslation } from '../../core'
+import { editorRootElementRef$, iconComponentFor$, readOnly$, useTranslation } from '../../core/index.js'
 import styles from '../../../styles/ui.module.css'
-import { TooltipWrap } from './TooltipWrap'
+import { TooltipWrap } from './TooltipWrap.js'
 import { useCellValue, useCellValues } from '@mdxeditor/gurx'
 
 const MAX_SUGGESTIONS = 20

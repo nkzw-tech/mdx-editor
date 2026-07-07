@@ -19,19 +19,19 @@ import {
 } from 'lexical'
 import * as Mdast from 'mdast'
 import React, { ElementType } from 'react'
-import { exportLexicalTreeToMdast } from '../../exportMarkdownFromLexical'
-import { importMdastTreeToLexical } from '../../importMarkdownToLexical'
-import { lexicalTheme } from '../../styles/lexicalTheme'
-import { TableNode } from './TableNode'
+import { exportLexicalTreeToMdast } from '../../exportMarkdownFromLexical.js'
+import { importMdastTreeToLexical } from '../../importMarkdownToLexical.js'
+import { lexicalTheme } from '../../styles/lexicalTheme.js'
+import { TableNode } from './TableNode.js'
 
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { mergeRegister } from '@lexical/utils'
 import * as RadixToolbar from '@radix-ui/react-toolbar'
 import classNames from 'classnames'
-import { EditorIcon } from '../../EditorIcon'
+import { EditorIcon } from '../../EditorIcon.js'
 import styles from '../../styles/ui.module.css'
-import { isPartOftheEditorUI } from '../../utils/isPartOftheEditorUI'
-import { uuidv4 } from '../../utils/uuid4'
+import { isPartOftheEditorUI } from '../../utils/isPartOftheEditorUI.js'
+import { uuidv4 } from '../../utils/uuid4.js'
 import {
   NESTED_EDITOR_UPDATED_COMMAND,
   codeBlockEditorDescriptors$,
@@ -47,7 +47,7 @@ import {
   rootEditor$,
   useTranslation,
   usedLexicalNodes$
-} from '../core'
+} from '../core/index.js'
 import { useCellValues } from '@mdxeditor/gurx'
 
 /**

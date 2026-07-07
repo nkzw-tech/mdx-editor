@@ -3,9 +3,9 @@ import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 import classNames from 'classnames'
 import { $getNodeByKey } from 'lexical'
 import React, { JSX } from 'react'
-import { disableImageSettingsButton$, openEditImageDialog$, parseImageDimension } from '.'
+import { disableImageSettingsButton$, openEditImageDialog$, parseImageDimension } from './index.js'
 import styles from '../../styles/ui.module.css'
-import { iconComponentFor$, readOnly$, useTranslation } from '../core'
+import { iconComponentFor$, readOnly$, useTranslation } from '../core/index.js'
 
 export interface EditImageToolbarProps {
   nodeKey: string

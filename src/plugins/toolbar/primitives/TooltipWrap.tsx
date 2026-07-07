@@ -3,7 +3,7 @@ import classNames from 'classnames'
 import React, { ReactNode } from 'react'
 import styles from '../../../styles/ui.module.css'
 import { useCellValue } from '@mdxeditor/gurx'
-import { editorRootElementRef$ } from '../../core'
+import { editorRootElementRef$ } from '../../core/index.js'
 
 /**
  * A styled wrapper around the radix-ui tooltip, that lets you display an instant tooltip on hover.

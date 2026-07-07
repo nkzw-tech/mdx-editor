@@ -1,10 +1,10 @@
 import { useCellValues } from '@mdxeditor/gurx'
 import React from 'react'
-import { EditorIcon } from '../../EditorIcon'
+import { EditorIcon } from '../../EditorIcon.js'
 import styles from '../../styles/ui.module.css'
-import { CodeBlockEditorProps } from '../codeblock'
-import { useCodeBlockEditorContext } from '../codeblock/CodeBlockNode'
-import { readOnly$, useTranslation } from '../core'
+import { CodeBlockEditorProps } from '../codeblock/index.js'
+import { useCodeBlockEditorContext } from '../codeblock/CodeBlockNode.js'
+import { readOnly$, useTranslation } from '../core/index.js'
 
 import { languages } from '@codemirror/language-data'
 import { EditorState, Extension } from '@codemirror/state'
@@ -19,9 +19,9 @@ import {
   codeMirrorAutoLoadLanguageSupport$,
   codeMirrorExtensions$,
   getCodeBlockLanguageSelectData
-} from '.'
-import { useCodeMirrorRef } from './useCodeMirrorRef'
-import { Select } from '../toolbar/primitives/select'
+} from './index.js'
+import { useCodeMirrorRef } from './useCodeMirrorRef.js'
+import { Select } from '../toolbar/primitives/select.js'
 
 export const COMMON_STATE_CONFIG_EXTENSIONS: Extension[] = []
 

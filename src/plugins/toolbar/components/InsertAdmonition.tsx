@@ -1,10 +1,10 @@
 import React from 'react'
-import { ButtonOrDropdownButton } from '.././primitives/toolbar'
-import { insertDirective$ } from '../../directives'
-import { ADMONITION_TYPES } from '../../../directive-editors/AdmonitionDirectiveDescriptor'
+import { ButtonOrDropdownButton } from '.././primitives/toolbar.js'
+import { insertDirective$ } from '../../directives/index.js'
+import { ADMONITION_TYPES } from '../../../directive-editors/AdmonitionDirectiveDescriptor.js'
 import { useCellValue, usePublisher } from '@mdxeditor/gurx'
-import { iconComponentFor$, useTranslation } from '../../core'
-import { admonitionLabelsMap } from './ChangeAdmonitionType'
+import { iconComponentFor$, useTranslation } from '../../core/index.js'
+import { admonitionLabelsMap } from './ChangeAdmonitionType.js'
 
 /**
  * A toolbar dropdown button that allows the user to insert admonitions.

@@ -6,5 +6,5 @@ export {
   type MarkdownSaveStatus,
   type PersistentMarkdownEditorHandle,
   type PersistentMarkdownEditorProps
-} from './PersistentMarkdownEditor'
+} from './PersistentMarkdownEditor.js'
 

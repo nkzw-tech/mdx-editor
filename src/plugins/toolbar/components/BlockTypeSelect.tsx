@@ -2,9 +2,9 @@ import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text'
 import { useCellValue, usePublisher } from '@mdxeditor/gurx'
 import { $createParagraphNode } from 'lexical'
 import React, { JSX } from 'react'
-import { BlockType, activePlugins$, convertSelectionToNode$, currentBlockType$, useTranslation } from '../../core'
-import { allowedHeadingLevels$ } from '../../headings'
-import { Select } from '.././primitives/select'
+import { BlockType, activePlugins$, convertSelectionToNode$, currentBlockType$, useTranslation } from '../../core/index.js'
+import { allowedHeadingLevels$ } from '../../headings/index.js'
+import { Select } from '.././primitives/select.js'
 
 /**
  * A toolbar component that allows the user to change the block type of the current selection.

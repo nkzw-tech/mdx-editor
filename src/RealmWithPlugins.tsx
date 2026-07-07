@@ -1,6 +1,6 @@
 import React from 'react'
 import { Realm, RealmContext } from '@mdxeditor/gurx'
-import { tap } from './utils/fp'
+import { tap } from './utils/fp.js'
 
 /**
  * A plugin for the editor.

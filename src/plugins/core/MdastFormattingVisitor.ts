@@ -10,8 +10,8 @@ import {
   IS_SUBSCRIPT,
   IS_SUPERSCRIPT,
   IS_UNDERLINE
-} from '../../FormatConstants'
-import { MdastImportVisitor } from '../../importMarkdownToLexical'
+} from '../../FormatConstants.js'
+import { MdastImportVisitor } from '../../importMarkdownToLexical.js'
 import { $createTextNode } from 'lexical'
 
 function buildFormattingVisitors(tag: string, format: FORMAT): MdastImportVisitor<Mdast.RootContent>[] {

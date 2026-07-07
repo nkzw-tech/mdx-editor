@@ -1,8 +1,8 @@
 import React from 'react'
-import { ButtonWithTooltip } from '.././primitives/toolbar'
-import { insertCodeBlock$ } from '../../codeblock/'
+import { ButtonWithTooltip } from '.././primitives/toolbar.js'
+import { insertCodeBlock$ } from '../../codeblock//index.js'
 import { useCellValue, usePublisher } from '@mdxeditor/gurx'
-import { iconComponentFor$, useTranslation } from '../../core'
+import { iconComponentFor$, useTranslation } from '../../core/index.js'
 
 /**
  * A toolbar button that allows the user to insert a fenced code block.

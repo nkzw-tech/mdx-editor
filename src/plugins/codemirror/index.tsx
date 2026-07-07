@@ -1,7 +1,7 @@
-import { realmPlugin } from '../../RealmWithPlugins'
+import { realmPlugin } from '../../RealmWithPlugins.js'
 import { Cell, Signal, map } from '@mdxeditor/gurx'
-import { CodeBlockEditorDescriptor, appendCodeBlockEditorDescriptor$, insertCodeBlock$ } from '../codeblock'
-import { CodeMirrorEditor } from './CodeMirrorEditor'
+import { CodeBlockEditorDescriptor, appendCodeBlockEditorDescriptor$, insertCodeBlock$ } from '../codeblock/index.js'
+import { CodeMirrorEditor } from './CodeMirrorEditor.js'
 import type { Extension } from '@codemirror/state'
 
 /**

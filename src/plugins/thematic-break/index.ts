@@ -1,10 +1,10 @@
-import { realmPlugin } from '../../RealmWithPlugins'
+import { realmPlugin } from '../../RealmWithPlugins.js'
 import { HorizontalRuleNode, INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode.js'
 import { HorizontalRulePlugin } from '@lexical/react/LexicalHorizontalRulePlugin.js'
 import { Action, withLatestFrom } from '@mdxeditor/gurx'
-import { activeEditor$, addActivePlugin$, addComposerChild$, addExportVisitor$, addImportVisitor$, addLexicalNode$ } from '../core'
-import { LexicalThematicBreakVisitor } from './LexicalThematicBreakVisitor'
-import { MdastThematicBreakVisitor } from './MdastThematicBreakVisitor'
+import { activeEditor$, addActivePlugin$, addComposerChild$, addExportVisitor$, addImportVisitor$, addLexicalNode$ } from '../core/index.js'
+import { LexicalThematicBreakVisitor } from './LexicalThematicBreakVisitor.js'
+import { MdastThematicBreakVisitor } from './MdastThematicBreakVisitor.js'
 
 /**
  * Inserts a thematic break at the current selection.

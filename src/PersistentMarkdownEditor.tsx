@@ -9,7 +9,7 @@ import {
   MarkdownEditor,
   type MarkdownEditorHandle,
   type MarkdownEditorProps
-} from './MarkdownEditor'
+} from './MarkdownEditor.js'
 
 export type MarkdownDocument = {
   content: string

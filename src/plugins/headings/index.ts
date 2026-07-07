@@ -1,8 +1,8 @@
 import { $createHeadingNode, HeadingNode } from '@lexical/rich-text'
 import { Cell } from '@mdxeditor/gurx'
 import { $createParagraphNode, COMMAND_PRIORITY_LOW, KEY_DOWN_COMMAND } from 'lexical'
-import { realmPlugin } from '../../RealmWithPlugins'
-import { controlOrMeta } from '../../utils/detectMac'
+import { realmPlugin } from '../../RealmWithPlugins.js'
+import { controlOrMeta } from '../../utils/detectMac.js'
 import {
   addActivePlugin$,
   addExportVisitor$,
@@ -10,9 +10,9 @@ import {
   addLexicalNode$,
   convertSelectionToNode$,
   createRootEditorSubscription$
-} from '../core'
-import { LexicalHeadingVisitor } from './LexicalHeadingVisitor'
-import { MdastHeadingVisitor } from './MdastHeadingVisitor'
+} from '../core/index.js'
+import { LexicalHeadingVisitor } from './LexicalHeadingVisitor.js'
+import { MdastHeadingVisitor } from './MdastHeadingVisitor.js'
 
 const FORMATTING_KEYS = ['Digit0', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6']
 

@@ -4,9 +4,9 @@ import { afterEach, describe, expect, test, vi } from 'vitest'
 import {
   MarkdownEditor,
   type MarkdownEditorHandle
-} from '../MarkdownEditor'
-import { frontmatterPlugin } from '../plugins/frontmatter'
-import { imagePlugin } from '../plugins/image'
+} from '../MarkdownEditor.js'
+import { frontmatterPlugin } from '../plugins/frontmatter/index.js'
+import { imagePlugin } from '../plugins/image/index.js'
 
 afterEach(() => {
   vi.unstubAllGlobals()

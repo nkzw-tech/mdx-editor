@@ -1,4 +1,4 @@
-import { noop } from './fp'
+import { noop } from './fp.js'
 
 /**
  * An emitter object that has a single subscription that will be executed.

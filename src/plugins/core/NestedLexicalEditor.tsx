@@ -33,22 +33,22 @@ import {
   nestedEditorChildren$,
   rootEditor$,
   usedLexicalNodes$
-} from '.'
+} from './index.js'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
 import { LexicalNestedComposer } from '@lexical/react/LexicalNestedComposer'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import classNames from 'classnames'
-import { exportLexicalTreeToMdast } from '../../exportMarkdownFromLexical'
-import { importMdastTreeToLexical } from '../../importMarkdownToLexical'
+import { exportLexicalTreeToMdast } from '../../exportMarkdownFromLexical.js'
+import { importMdastTreeToLexical } from '../../importMarkdownToLexical.js'
 import styles from '../../styles/ui.module.css'
-import { SharedHistoryPlugin } from './SharedHistoryPlugin'
+import { SharedHistoryPlugin } from './SharedHistoryPlugin.js'
 import { mergeRegister } from '@lexical/utils'
-import { VoidEmitter } from '../../utils/voidEmitter'
-import { isPartOftheEditorUI } from '../../utils/isPartOftheEditorUI'
+import { VoidEmitter } from '../../utils/voidEmitter.js'
+import { isPartOftheEditorUI } from '../../utils/isPartOftheEditorUI.js'
 import { useCellValues, usePublisher, useRealm } from '@mdxeditor/gurx'
-import { DirectiveNode } from '../directives'
-import { LexicalJsxNode } from '../jsx/LexicalJsxNode'
+import { DirectiveNode } from '../directives/index.js'
+import { LexicalJsxNode } from '../jsx/LexicalJsxNode.js'
 
 /**
  * The value of the {@link NestedEditorsContext} React context.

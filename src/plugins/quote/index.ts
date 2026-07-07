@@ -1,8 +1,8 @@
 import { QuoteNode } from '@lexical/rich-text'
-import { MdastBlockQuoteVisitor } from './MdastBlockQuoteVisitor'
-import { LexicalQuoteVisitor } from './LexicalQuoteVisitor'
-import { realmPlugin } from '../../RealmWithPlugins'
-import { addActivePlugin$, addImportVisitor$, addLexicalNode$, addExportVisitor$ } from '../core'
+import { MdastBlockQuoteVisitor } from './MdastBlockQuoteVisitor.js'
+import { LexicalQuoteVisitor } from './LexicalQuoteVisitor.js'
+import { realmPlugin } from '../../RealmWithPlugins.js'
+import { addActivePlugin$, addImportVisitor$, addLexicalNode$, addExportVisitor$ } from '../core/index.js'
 
 /**
  * A plugin that adds support for block quotes to the editor.

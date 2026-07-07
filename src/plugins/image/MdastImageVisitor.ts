@@ -1,6 +1,6 @@
 import * as Mdast from 'mdast'
-import { MdastImportVisitor } from '../../importMarkdownToLexical'
-import { $createImageNode } from './ImageNode'
+import { MdastImportVisitor } from '../../importMarkdownToLexical.js'
+import { $createImageNode } from './ImageNode.js'
 import { MdxJsxTextElement, MdxJsxFlowElement } from 'mdast-util-mdx'
 import { $createParagraphNode, RootNode } from 'lexical'
 

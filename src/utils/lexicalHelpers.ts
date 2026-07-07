@@ -14,8 +14,8 @@ import { $isLinkNode } from '@lexical/link'
 import { $isHeadingNode } from '@lexical/rich-text'
 import { $isListNode, $isListItemNode } from '@lexical/list'
 import { $isAtNodeEnd } from '@lexical/selection'
-import { tap } from './fp'
-import { ExportMarkdownFromLexicalOptions, exportMarkdownFromLexical } from '../exportMarkdownFromLexical'
+import { tap } from './fp.js'
+import { ExportMarkdownFromLexicalOptions, exportMarkdownFromLexical } from '../exportMarkdownFromLexical.js'
 
 /**
  * Fetches a value from the Lexical editor read cycle.

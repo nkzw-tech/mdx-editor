@@ -1,7 +1,7 @@
 import { Realm } from '@mdxeditor/gurx'
 import React, { FC, PropsWithChildren, createContext, useCallback, useEffect, useMemo } from 'react'
-import { realmPlugin } from '../../RealmWithPlugins'
-import { addComposerChild$ } from '../core'
+import { realmPlugin } from '../../RealmWithPlugins.js'
+import { addComposerChild$ } from '../core/index.js'
 
 interface RemoteMDXEditorRealmContextValue {
   editorMap: Map<string, Realm>

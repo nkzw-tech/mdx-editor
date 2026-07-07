@@ -1,7 +1,7 @@
 import { $createTextNode, ElementNode } from 'lexical'
 import { Directives } from 'mdast-util-directive'
-import { MdastImportVisitor } from '../../importMarkdownToLexical'
-import { $createDirectiveNode } from './DirectiveNode'
+import { MdastImportVisitor } from '../../importMarkdownToLexical.js'
+import { $createDirectiveNode } from './DirectiveNode.js'
 import * as Mdast from 'mdast'
 
 const DIRECTIVE_TYPES = ['leafDirective', 'containerDirective', 'textDirective']

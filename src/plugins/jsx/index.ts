@@ -12,18 +12,18 @@ import {
   insertDecoratorNode$,
   jsxComponentDescriptors$,
   jsxIsAvailable$
-} from '../core'
-import { $createLexicalJsxNode, LexicalJsxNode } from './LexicalJsxNode'
-import { LexicalJsxVisitor } from './LexicalJsxVisitor'
-import { MdastMdxJsEsmVisitor } from './MdastMdxJsEsmVisitor'
-import { MdastMdxJsxElementVisitor } from './MdastMdxJsxElementVisitor'
+} from '../core/index.js'
+import { $createLexicalJsxNode, LexicalJsxNode } from './LexicalJsxNode.js'
+import { LexicalJsxVisitor } from './LexicalJsxVisitor.js'
+import { MdastMdxJsEsmVisitor } from './MdastMdxJsEsmVisitor.js'
+import { MdastMdxJsxElementVisitor } from './MdastMdxJsxElementVisitor.js'
 import * as Mdast from 'mdast'
 import { Signal, map } from '@mdxeditor/gurx'
-import { realmPlugin } from '../../RealmWithPlugins'
-import { MdastMdxExpressionVisitor } from './MdastMdxExpressionVisitor'
-import { LexicalMdxExpressionNode } from './LexicalMdxExpressionNode'
-import { LexicalMdxExpressionVisitor } from './LexicalMdxExpressionVisitor'
-import { GenericJsxEditor } from '../../jsx-editors/GenericJsxEditor'
+import { realmPlugin } from '../../RealmWithPlugins.js'
+import { MdastMdxExpressionVisitor } from './MdastMdxExpressionVisitor.js'
+import { LexicalMdxExpressionNode } from './LexicalMdxExpressionNode.js'
+import { LexicalMdxExpressionVisitor } from './LexicalMdxExpressionVisitor.js'
+import { GenericJsxEditor } from '../../jsx-editors/GenericJsxEditor.js'
 
 /**
  * An MDX JSX MDAST node.

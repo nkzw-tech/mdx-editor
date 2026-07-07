@@ -32,7 +32,7 @@ import type {
   MarkdownAnnotationLayout,
   MarkdownAnnotationRect,
   MarkdownCommentTarget
-} from './annotations'
+} from './annotations.js'
 
 const commentableTypes = new Set([
   'codeblock',

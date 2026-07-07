@@ -1,7 +1,7 @@
 import React from 'react'
-import { DiffViewer } from './DiffViewer'
-import { SourceEditor } from './SourceEditor'
-import { markdownProcessingError$, viewMode$ } from '../core'
+import { DiffViewer } from './DiffViewer.js'
+import { SourceEditor } from './SourceEditor.js'
+import { markdownProcessingError$, viewMode$ } from '../core/index.js'
 import styles from '../../styles/ui.module.css'
 import { useCellValues } from '@mdxeditor/gurx'
 

@@ -28,11 +28,11 @@ import {
   imagePlaceholder$ as imagePlaceholderComponent$,
   imagePreviewHandler$,
   allowSetImageDimensions$
-} from '.'
+} from './index.js'
 import styles from '../../styles/ui.module.css'
-import { readOnly$ } from '../core'
-import { $isImageNode } from './ImageNode'
-import ImageResizer from './ImageResizer'
+import { readOnly$ } from '../core/index.js'
+import { $isImageNode } from './ImageNode.js'
+import ImageResizer from './ImageResizer.js'
 
 const BROKEN_IMG_URI =
   'data:image/svg+xml;charset=utf-8,' +

@@ -1,5 +1,5 @@
 import { $isMarkNode, type MarkNode } from '@lexical/mark'
-import type { LexicalExportVisitor } from '../../exportMarkdownFromLexical'
+import type { LexicalExportVisitor } from '../../exportMarkdownFromLexical.js'
 
 export const LexicalMarkVisitor: LexicalExportVisitor<MarkNode, never> = {
   testLexicalNode: $isMarkNode,

@@ -1,10 +1,10 @@
 import React, { JSX } from 'react'
 import * as RadixSelect from '@radix-ui/react-select'
 import classNames from 'classnames'
-import { EditorIcon } from '../../../EditorIcon'
+import { EditorIcon } from '../../../EditorIcon.js'
 import styles from '../../../styles/ui.module.css'
-import { TooltipWrap } from './TooltipWrap'
-import { editorRootElementRef$, readOnly$ } from '../../core'
+import { TooltipWrap } from './TooltipWrap.js'
+import { editorRootElementRef$, readOnly$ } from '../../core/index.js'
 import { useCellValue } from '@mdxeditor/gurx'
 
 /**

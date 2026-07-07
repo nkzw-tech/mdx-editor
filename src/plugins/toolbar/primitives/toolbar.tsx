@@ -3,9 +3,9 @@ import * as RadixToolbar from '@radix-ui/react-toolbar'
 import classNames from 'classnames'
 import React, { JSX } from 'react'
 import styles from '../../../styles/ui.module.css'
-import { TooltipWrap } from './TooltipWrap'
-import { SelectButtonTrigger, SelectContent, SelectItem } from './select'
-import { EditorInFocus, editorInFocus$, readOnly$, useTranslation } from '../../core'
+import { TooltipWrap } from './TooltipWrap.js'
+import { SelectButtonTrigger, SelectContent, SelectItem } from './select.js'
+import { EditorInFocus, editorInFocus$, readOnly$, useTranslation } from '../../core/index.js'
 import { useCellValue } from '@mdxeditor/gurx'
 
 //

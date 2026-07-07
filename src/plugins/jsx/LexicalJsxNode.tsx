@@ -2,12 +2,12 @@
 import type { EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import { DecoratorNode } from 'lexical'
 import React, { JSX } from 'react'
-import { NestedEditorsContext } from '../core/NestedLexicalEditor'
-import { MdastJsx } from '.'
-import { VoidEmitter, voidEmitter } from '../../utils/voidEmitter'
+import { NestedEditorsContext } from '../core/NestedLexicalEditor.js'
+import { MdastJsx } from './index.js'
+import { VoidEmitter, voidEmitter } from '../../utils/voidEmitter.js'
 import { useCellValue } from '@mdxeditor/gurx'
-import { jsxComponentDescriptors$ } from '../core'
-import { ImportStatement } from '../../importMarkdownToLexical'
+import { jsxComponentDescriptors$ } from '../core/index.js'
+import { ImportStatement } from '../../importMarkdownToLexical.js'
 
 /**
  * A serialized representation of an {@link LexicalJsxNode}.

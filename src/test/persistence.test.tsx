@@ -4,8 +4,8 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import {
   PersistentMarkdownEditor,
   type PersistentMarkdownEditorHandle
-} from '../PersistentMarkdownEditor'
-import type { MarkdownEditorProps } from '../MarkdownEditor'
+} from '../PersistentMarkdownEditor.js'
+import type { MarkdownEditorProps } from '../MarkdownEditor.js'
 
 type TestDocument = {
   content: string

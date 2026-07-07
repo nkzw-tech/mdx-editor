@@ -1,11 +1,11 @@
 import React from 'react'
-import { MdastLinkVisitor } from './MdastLinkVisitor'
-import { LexicalLinkVisitor } from './LexicalLinkVisitor'
+import { MdastLinkVisitor } from './MdastLinkVisitor.js'
+import { LexicalLinkVisitor } from './LexicalLinkVisitor.js'
 import { AutoLinkNode, LinkNode } from '@lexical/link'
 import { LinkPlugin as LexicalLinkPlugin } from '@lexical/react/LexicalLinkPlugin'
-import { LexicalAutoLinkPlugin } from './AutoLinkPlugin'
+import { LexicalAutoLinkPlugin } from './AutoLinkPlugin.js'
 import { Cell } from '@mdxeditor/gurx'
-import { realmPlugin } from '../../RealmWithPlugins'
+import { realmPlugin } from '../../RealmWithPlugins.js'
 import {
   addImportVisitor$,
   addLexicalNode$,
@@ -14,7 +14,7 @@ import {
   addActivePlugin$,
   addNestedEditorChild$,
   addTableCellEditorChild$
-} from '../core'
+} from '../core/index.js'
 
 /**
  * Holds whether the auto-linking of URLs and email addresses is disabled.

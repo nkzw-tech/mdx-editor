@@ -8,10 +8,10 @@ import {
   MdxJsxTextElement
 } from 'mdast-util-mdx-jsx'
 import React from 'react'
-import { NestedLexicalEditor, useMdastNodeUpdater } from '../plugins/core/NestedLexicalEditor'
-import { PropertyPopover } from '../plugins/core/PropertyPopover'
+import { NestedLexicalEditor, useMdastNodeUpdater } from '../plugins/core/NestedLexicalEditor.js'
+import { PropertyPopover } from '../plugins/core/PropertyPopover.js'
 import styles from '../styles/ui.module.css'
-import { JsxEditorProps } from '../plugins/jsx'
+import { JsxEditorProps } from '../plugins/jsx/index.js'
 
 const isExpressionValue = (value: string | MdxJsxAttributeValueExpression | null | undefined): value is MdxJsxAttributeValueExpression => {
   if (value !== null && typeof value === 'object' && 'type' in value && 'value' in value && typeof value.value === 'string') {

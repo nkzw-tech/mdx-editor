@@ -4,8 +4,8 @@ import { expect, test, vi } from 'vitest'
 import {
   MarkdownEditor,
   type MarkdownEditorHandle
-} from '../MarkdownEditor'
-import type { MarkdownAnnotationAnchor } from '../annotations'
+} from '../MarkdownEditor.js'
+import type { MarkdownAnnotationAnchor } from '../annotations.js'
 
 const hashText = (value: string) => {
   let hash = 2166136261

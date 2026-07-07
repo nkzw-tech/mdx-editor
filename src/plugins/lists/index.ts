@@ -11,11 +11,11 @@ import {
   addToMarkdownExtension$,
   currentSelection$,
   rootEditor$
-} from '../core'
-import { MdastListVisitor } from './MdastListVisitor'
-import { MdastListItemVisitor } from './MdastListItemVisitor'
-import { LexicalListVisitor } from './LexicalListVisitor'
-import { LexicalListItemVisitor } from './LexicalListItemVisitor'
+} from '../core/index.js'
+import { MdastListVisitor } from './MdastListVisitor.js'
+import { MdastListItemVisitor } from './MdastListItemVisitor.js'
+import { LexicalListVisitor } from './LexicalListVisitor.js'
+import { LexicalListItemVisitor } from './LexicalListItemVisitor.js'
 import {
   INSERT_CHECK_LIST_COMMAND,
   INSERT_ORDERED_LIST_COMMAND,
@@ -36,9 +36,9 @@ import { $findMatchingParent, $getNearestNodeOfType } from '@lexical/utils'
 import { gfmTaskListItem } from 'micromark-extension-gfm-task-list-item'
 import { gfmTaskListItemFromMarkdown, gfmTaskListItemToMarkdown } from 'mdast-util-gfm-task-list-item'
 import { Cell, Signal, withLatestFrom } from '@mdxeditor/gurx'
-import { realmPlugin } from '../../RealmWithPlugins'
-import { NotesListItemNode } from './NotesListItemNode'
-import { CheckListPlugin } from './CheckListPlugin'
+import { realmPlugin } from '../../RealmWithPlugins.js'
+import { NotesListItemNode } from './NotesListItemNode.js'
+import { CheckListPlugin } from './CheckListPlugin.js'
 
 const listItemNodeReplacement = {
   replace: ListItemNode,

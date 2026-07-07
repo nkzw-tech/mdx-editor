@@ -7,7 +7,7 @@ import {
   KEY_ENTER_COMMAND
 } from 'lexical'
 import { describe, expect, test } from 'vitest'
-import { registerHorizontalRuleOnEnter } from '../horizontalRuleShortcut'
+import { registerHorizontalRuleOnEnter } from '../horizontalRuleShortcut.js'
 
 const createTestEditor = (text: string) => {
   const editor = createEditor({

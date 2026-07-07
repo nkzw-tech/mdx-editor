@@ -12,30 +12,30 @@ import {
   useRef,
   useState
 } from 'react'
-import type { ToMarkdownOptions } from './exportMarkdownFromLexical'
+import type { ToMarkdownOptions } from './exportMarkdownFromLexical.js'
 import type {
   MarkdownAnnotation,
   MarkdownAnnotationAnchor,
   MarkdownAnnotationLayout,
   MarkdownCommentTarget
-} from './annotations'
-import { horizontalRuleOnEnterPlugin } from './horizontalRuleShortcut'
+} from './annotations.js'
+import { horizontalRuleOnEnterPlugin } from './horizontalRuleShortcut.js'
 import {
   MDXEditor,
   type MDXEditorMethods
-} from './MDXEditor'
-import { codeBlockPlugin } from './plugins/codeblock'
-import { codeMirrorPlugin } from './plugins/codemirror'
-import { headingsPlugin } from './plugins/headings'
-import { imagePlugin } from './plugins/image'
-import { linkDialogPlugin } from './plugins/link-dialog'
-import { linkPlugin } from './plugins/link'
-import { listsPlugin } from './plugins/lists'
-import { markdownShortcutPlugin } from './plugins/markdown-shortcut'
-import { quotePlugin } from './plugins/quote'
-import { tablePlugin } from './plugins/table'
-import { thematicBreakPlugin } from './plugins/thematic-break'
-import type { RealmPlugin } from './RealmWithPlugins'
+} from './MDXEditor.js'
+import { codeBlockPlugin } from './plugins/codeblock/index.js'
+import { codeMirrorPlugin } from './plugins/codemirror/index.js'
+import { headingsPlugin } from './plugins/headings/index.js'
+import { imagePlugin } from './plugins/image/index.js'
+import { linkDialogPlugin } from './plugins/link-dialog/index.js'
+import { linkPlugin } from './plugins/link/index.js'
+import { listsPlugin } from './plugins/lists/index.js'
+import { markdownShortcutPlugin } from './plugins/markdown-shortcut/index.js'
+import { quotePlugin } from './plugins/quote/index.js'
+import { tablePlugin } from './plugins/table/index.js'
+import { thematicBreakPlugin } from './plugins/thematic-break/index.js'
+import type { RealmPlugin } from './RealmWithPlugins.js'
 
 const canonicalMarkdownOptions: ToMarkdownOptions = {
   bullet: '-',

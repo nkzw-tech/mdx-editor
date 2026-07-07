@@ -1,11 +1,11 @@
-import { applyFormat$, currentFormat$, iconComponentFor$, useTranslation } from '../../core'
+import { applyFormat$, currentFormat$, iconComponentFor$, useTranslation } from '../../core/index.js'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 import React from 'react'
-import { FORMAT, IS_BOLD, IS_ITALIC, IS_STRIKETHROUGH, IS_SUBSCRIPT, IS_SUPERSCRIPT, IS_UNDERLINE } from '../../../FormatConstants'
-import { ToggleSingleGroupWithItem } from '../primitives/toolbar'
+import { FORMAT, IS_BOLD, IS_ITALIC, IS_STRIKETHROUGH, IS_SUBSCRIPT, IS_SUPERSCRIPT, IS_UNDERLINE } from '../../../FormatConstants.js'
+import { ToggleSingleGroupWithItem } from '../primitives/toolbar.js'
 import { TextFormatType } from 'lexical'
 import styles from '../../../styles/ui.module.css'
-import { IconKey } from '../../../defaultSvgIcons'
+import { IconKey } from '../../../defaultSvgIcons.js'
 
 interface FormatButtonProps {
   format: FORMAT

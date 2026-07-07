@@ -2,10 +2,10 @@ import React, { JSX } from 'react'
 import type { EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import { DecoratorNode } from 'lexical'
 import { Directives } from 'mdast-util-directive'
-import { NestedEditorsContext } from '../core/NestedLexicalEditor'
-import { VoidEmitter, voidEmitter } from '../../utils/voidEmitter'
+import { NestedEditorsContext } from '../core/NestedLexicalEditor.js'
+import { VoidEmitter, voidEmitter } from '../../utils/voidEmitter.js'
 import { useCellValues } from '@mdxeditor/gurx'
-import { directiveDescriptors$ } from '../core'
+import { directiveDescriptors$ } from '../core/index.js'
 
 /**
  * A serialized representation of an {@link DirectiveNode}.

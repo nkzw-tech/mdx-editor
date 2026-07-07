@@ -1,11 +1,11 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import React from 'react'
 import { describe, expect, it } from 'vitest'
-import { MDXEditor } from '../MDXEditor'
-import { InsertImage } from '../plugins/toolbar/components/InsertImage'
-import { DialogButton } from '../plugins/toolbar/primitives/DialogButton'
-import { ButtonOrDropdownButton, ButtonWithTooltip } from '../plugins/toolbar/primitives/toolbar'
-import { toolbarPlugin } from '../plugins/toolbar'
+import { MDXEditor } from '../MDXEditor.js'
+import { InsertImage } from '../plugins/toolbar/components/InsertImage.js'
+import { DialogButton } from '../plugins/toolbar/primitives/DialogButton.js'
+import { ButtonOrDropdownButton, ButtonWithTooltip } from '../plugins/toolbar/primitives/toolbar.js'
+import { toolbarPlugin } from '../plugins/toolbar/index.js'
 
 describe('toolbar accessibility', () => {
   it('exposes accessible names for icon-only toolbar controls', () => {

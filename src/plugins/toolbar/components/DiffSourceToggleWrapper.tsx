@@ -1,8 +1,8 @@
-import { iconComponentFor$, useTranslation, ViewMode, viewMode$ } from '../../core'
+import { iconComponentFor$, useTranslation, ViewMode, viewMode$ } from '../../core/index.js'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 import React from 'react'
 import styles from '../../../styles/ui.module.css'
-import { SingleChoiceToggleGroup } from '.././primitives/toolbar'
+import { SingleChoiceToggleGroup } from '.././primitives/toolbar.js'
 
 /**
  * A wrapper element for the toolbar contents that lets the user toggle between rich text, diff and source mode.

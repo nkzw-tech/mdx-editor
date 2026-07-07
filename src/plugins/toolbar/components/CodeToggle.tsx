@@ -1,7 +1,7 @@
 import React from 'react'
-import { IS_CODE } from '../../../FormatConstants'
-import { applyFormat$, currentFormat$, iconComponentFor$, useTranslation } from '../../core'
-import { MultipleChoiceToggleGroup } from '.././primitives/toolbar'
+import { IS_CODE } from '../../../FormatConstants.js'
+import { applyFormat$, currentFormat$, iconComponentFor$, useTranslation } from '../../core/index.js'
+import { MultipleChoiceToggleGroup } from '.././primitives/toolbar.js'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 
 /**

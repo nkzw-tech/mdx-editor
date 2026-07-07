@@ -10,9 +10,8 @@ import {
 } from 'lexical'
 import * as Mdast from 'mdast'
 import React, { JSX } from 'react'
-import { noop } from '../../utils/fp'
-import { TableEditor } from './TableEditor'
-import { TableCell, TableRow } from 'mdast-util-gfm-table/lib'
+import { noop } from '../../utils/fp.js'
+import { TableEditor } from './TableEditor.js'
 
 /**
  * A serialized representation of a {@link TableNode}.
@@ -266,9 +265,9 @@ export function $convertTableElement(element: HTMLElement): DOMConversionOutput 
               value: cell.textContent
             }
           ]
-        } satisfies TableCell
+        } satisfies Mdast.TableCell
       })
-    } satisfies TableRow
+    } satisfies Mdast.TableRow
   })
 
   return {

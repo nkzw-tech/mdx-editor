@@ -1,4 +1,4 @@
-import type { CodeBlockEditorDescriptor } from '.'
+import type { CodeBlockEditorDescriptor } from './index.js'
 
 export function findCodeBlockDescriptor(
   descriptors: CodeBlockEditorDescriptor[],

@@ -2,10 +2,10 @@ import { $isElementNode, ElementNode as LexicalElementNode, LexicalNode, RootNod
 import * as Mdast from 'mdast'
 import type { MdxjsEsm } from 'mdast-util-mdx'
 import { type Options as MdastToMarkdownOptions, toMarkdown } from 'mdast-util-to-markdown'
-import { ImportStatement } from './importMarkdownToLexical'
-import { isMdastHTMLNode } from './plugins/core/MdastHTMLNode'
-import type { JsxComponentDescriptor } from './plugins/jsx'
-import { mergeStyleAttributes } from './utils/mergeStyleAttributes'
+import { ImportStatement } from './importMarkdownToLexical.js'
+import { isMdastHTMLNode } from './plugins/core/MdastHTMLNode.js'
+import type { JsxComponentDescriptor } from './plugins/jsx/index.js'
+import { mergeStyleAttributes } from './utils/mergeStyleAttributes.js'
 
 // Keep this as an interface so API Extractor emits the package-root import.
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

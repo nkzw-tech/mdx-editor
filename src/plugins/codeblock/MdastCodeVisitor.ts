@@ -1,7 +1,7 @@
 import * as Mdast from 'mdast'
-import { $createCodeBlockNode } from './CodeBlockNode'
-import { MdastImportVisitor } from '../../importMarkdownToLexical'
-import { findCodeBlockDescriptor } from './findCodeBlockDescriptor'
+import { $createCodeBlockNode } from './CodeBlockNode.js'
+import { MdastImportVisitor } from '../../importMarkdownToLexical.js'
+import { findCodeBlockDescriptor } from './findCodeBlockDescriptor.js'
 
 export const MdastCodeVisitor: MdastImportVisitor<Mdast.Code> = {
   testNode: (node, { codeBlockEditorDescriptors, defaultCodeBlockLanguage }) => {

@@ -1,8 +1,8 @@
 import React from 'react'
-import { applyListType$, currentListType$ } from '../../lists'
-import { SingleChoiceToggleGroup } from '.././primitives/toolbar'
+import { applyListType$, currentListType$ } from '../../lists/index.js'
+import { SingleChoiceToggleGroup } from '.././primitives/toolbar.js'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
-import { editorInTable$, iconComponentFor$, useTranslation } from '../../core'
+import { editorInTable$, iconComponentFor$, useTranslation } from '../../core/index.js'
 
 const ICON_NAME_MAP = {
   bullet: 'format_list_bulleted',

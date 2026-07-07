@@ -19,12 +19,12 @@ import {
 } from 'lexical'
 import { $isListItemNode, $isListNode } from '@lexical/list'
 import { afterEach, describe, expect, test, vi } from 'vitest'
-import { MDXEditor, type MDXEditorMethods } from '../MDXEditor'
-import { realmPlugin } from '../RealmWithPlugins'
-import { rootEditor$ } from '../plugins/core'
-import { listsPlugin } from '../plugins/lists'
-import { markdownShortcutPlugin } from '../plugins/markdown-shortcut'
-import { registerCodeBoundaryEscape } from '../registerCodeBoundaryEscape'
+import { MDXEditor, type MDXEditorMethods } from '../MDXEditor.js'
+import { realmPlugin } from '../RealmWithPlugins.js'
+import { rootEditor$ } from '../plugins/core/index.js'
+import { listsPlugin } from '../plugins/lists/index.js'
+import { markdownShortcutPlugin } from '../plugins/markdown-shortcut/index.js'
+import { registerCodeBoundaryEscape } from '../registerCodeBoundaryEscape.js'
 
 const defaultGetComputedStyle = window.getComputedStyle.bind(window)
 

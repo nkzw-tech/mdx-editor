@@ -1,8 +1,8 @@
-import { realmPlugin } from '../../RealmWithPlugins'
+import { realmPlugin } from '../../RealmWithPlugins.js'
 import { Cell, useCellValues } from '@mdxeditor/gurx'
 import React from 'react'
-import { addTopAreaChild$, addBottomAreaChild$, readOnly$ } from '../core'
-import { Root } from './primitives/toolbar'
+import { addTopAreaChild$, addBottomAreaChild$, readOnly$ } from '../core/index.js'
+import { Root } from './primitives/toolbar.js'
 
 /**
  * The factory function that returns the contents of the toolbar.

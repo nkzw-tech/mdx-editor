@@ -1,8 +1,8 @@
 import { $trimTextContentFromAnchor } from '@lexical/selection'
 import { $restoreEditorState } from '@lexical/utils'
 import { $getSelection, $isRangeSelection, EditorState, RootNode } from 'lexical'
-import { realmPlugin } from '../../RealmWithPlugins'
-import { createRootEditorSubscription$ } from '../core'
+import { realmPlugin } from '../../RealmWithPlugins.js'
+import { createRootEditorSubscription$ } from '../core/index.js'
 
 /**
  * A plugin that limits the maximum length of the text content of the editor.

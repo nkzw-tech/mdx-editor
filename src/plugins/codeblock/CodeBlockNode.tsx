@@ -12,10 +12,10 @@ import {
   Spread
 } from 'lexical'
 import React from 'react'
-import { CodeBlockEditorProps, defaultCodeBlockLanguage$ } from '.'
-import { voidEmitter } from '../../utils/voidEmitter'
-import { NESTED_EDITOR_UPDATED_COMMAND, codeBlockEditorDescriptors$ } from '../core'
-import { findCodeBlockDescriptor } from './findCodeBlockDescriptor'
+import { CodeBlockEditorProps, defaultCodeBlockLanguage$ } from './index.js'
+import { voidEmitter } from '../../utils/voidEmitter.js'
+import { NESTED_EDITOR_UPDATED_COMMAND, codeBlockEditorDescriptors$ } from '../core/index.js'
+import { findCodeBlockDescriptor } from './findCodeBlockDescriptor.js'
 
 /**
  * The options necessary to construct a new code block node.

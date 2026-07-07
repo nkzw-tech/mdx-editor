@@ -9,7 +9,7 @@ import {
   UseFormRegister,
   UseFormSetValue
 } from 'react-hook-form'
-import { EditorIcon } from '../../../EditorIcon'
+import { EditorIcon } from '../../../EditorIcon.js'
 import styles from '../../../styles/ui.module.css'
 
 const MAX_SUGGESTIONS = 20

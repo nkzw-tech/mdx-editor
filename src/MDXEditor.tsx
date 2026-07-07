@@ -28,8 +28,8 @@ import {
   useTranslation,
   viewMode$,
   editorWrapperElementRef$
-} from './plugins/core'
-import { RealmPlugin, RealmWithPlugins } from './RealmWithPlugins'
+} from './plugins/core/index.js'
+import { RealmPlugin, RealmWithPlugins } from './RealmWithPlugins.js'
 
 import { createLexicalComposerContext, LexicalComposerContext, LexicalComposerContextType } from '@lexical/react/LexicalComposerContext'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
@@ -37,22 +37,22 @@ import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import classNames from 'classnames'
 import { EditorState, EditorThemeClasses, LexicalEditor } from 'lexical'
-import { defaultSvgIcons, IconKey } from './defaultSvgIcons'
-import { ToMarkdownOptions } from './exportMarkdownFromLexical'
-import { lexicalTheme } from './styles/lexicalTheme'
+import { defaultSvgIcons, IconKey } from './defaultSvgIcons.js'
+import { ToMarkdownOptions } from './exportMarkdownFromLexical.js'
+import { lexicalTheme } from './styles/lexicalTheme.js'
 import styles from './styles/ui.module.css'
-import { noop } from './utils/fp'
-import { getSelectionAsMarkdown } from './utils/lexicalHelpers'
+import { noop } from './utils/fp.js'
+import { getSelectionAsMarkdown } from './utils/lexicalHelpers.js'
 import {
   AnnotationController,
   type MarkdownAnnotationController
-} from './AnnotationController'
+} from './AnnotationController.js'
 import type {
   MarkdownAnnotation,
   MarkdownAnnotationAnchor,
   MarkdownAnnotationLayout,
   MarkdownCommentTarget
-} from './annotations'
+} from './annotations.js'
 
 const LexicalProvider: React.FC<{
   children: JSX.Element | string | (JSX.Element | string)[]

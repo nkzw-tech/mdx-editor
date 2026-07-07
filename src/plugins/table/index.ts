@@ -1,4 +1,4 @@
-import { realmPlugin } from '../../RealmWithPlugins'
+import { realmPlugin } from '../../RealmWithPlugins.js'
 import { Signal, map } from '@mdxeditor/gurx'
 import * as Mdast from 'mdast'
 import { gfmTableFromMarkdown, gfmTableToMarkdown, Options as GfmTableOptions } from 'mdast-util-gfm-table'
@@ -11,11 +11,11 @@ import {
   addSyntaxExtension$,
   addToMarkdownExtension$,
   insertDecoratorNode$
-} from '../core'
-import { LexicalTableVisitor } from './LexicalTableVisitor'
-import { MdastTableVisitor } from './MdastTableVisitor'
-import { $createTableNode, TableNode } from './TableNode'
-export * from './TableNode'
+} from '../core/index.js'
+import { LexicalTableVisitor } from './LexicalTableVisitor.js'
+import { MdastTableVisitor } from './MdastTableVisitor.js'
+import { $createTableNode, TableNode } from './TableNode.js'
+export * from './TableNode.js'
 
 function seedTable(rows = 1, columns = 1): Mdast.Table {
   const table: Mdast.Table = {

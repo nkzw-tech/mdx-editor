@@ -1,7 +1,7 @@
 import { ElementNode } from 'lexical'
 import * as Mdast from 'mdast'
-import { MdastImportVisitor } from '../../importMarkdownToLexical'
-import { $createTableNode } from './TableNode'
+import { MdastImportVisitor } from '../../importMarkdownToLexical.js'
+import { $createTableNode } from './TableNode.js'
 
 export const MdastTableVisitor: MdastImportVisitor<Mdast.Table> = {
   testNode: 'table',

@@ -7,7 +7,7 @@ export {
   type MarkdownEditorHandle,
   type MarkdownEditorProps,
   type MarkdownEditorVariant
-} from './MarkdownEditor'
+} from './MarkdownEditor.js'
 export type {
   MarkdownAnnotation,
   MarkdownAnnotationAnchor,
@@ -16,8 +16,8 @@ export type {
   MarkdownAnnotationQuote,
   MarkdownAnnotationRect,
   MarkdownCommentTarget
-} from './annotations'
+} from './annotations.js'
 export {
   horizontalRuleOnEnterPlugin,
   registerHorizontalRuleOnEnter
-} from './horizontalRuleShortcut'
+} from './horizontalRuleShortcut.js'

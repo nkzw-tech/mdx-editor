@@ -1,6 +1,6 @@
 import { $createListItemNode, ListNode } from '@lexical/list'
 import * as Mdast from 'mdast'
-import { MdastImportVisitor } from '../../importMarkdownToLexical'
+import { MdastImportVisitor } from '../../importMarkdownToLexical.js'
 
 export const MdastListItemVisitor: MdastImportVisitor<Mdast.ListItem> = {
   testNode: 'listItem',

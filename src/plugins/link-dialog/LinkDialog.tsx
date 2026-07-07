@@ -5,9 +5,9 @@ import * as Popover from '@radix-ui/react-popover'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import React from 'react'
 
-import { EditorIcon } from '../../EditorIcon'
-import { activeEditor$, editorRootElementRef$, useTranslation } from '../core'
-import { DownshiftAutoComplete } from '../core/ui/DownshiftAutoComplete'
+import { EditorIcon } from '../../EditorIcon.js'
+import { activeEditor$, editorRootElementRef$, useTranslation } from '../core/index.js'
+import { DownshiftAutoComplete } from '../core/ui/DownshiftAutoComplete.js'
 import styles from '@/styles/ui.module.css'
 import classNames from 'classnames'
 import { createCommand, LexicalCommand } from 'lexical'
@@ -22,7 +22,7 @@ import {
   updateLink$,
   onClickLinkCallback$,
   showLinkTitleField$
-} from '.'
+} from './index.js'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 
 export const OPEN_LINK_DIALOG: LexicalCommand<undefined> = createCommand()

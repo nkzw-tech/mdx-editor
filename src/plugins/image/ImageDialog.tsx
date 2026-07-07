@@ -3,7 +3,7 @@ import classNames from 'classnames'
 import React from 'react'
 import { useForm } from 'react-hook-form'
 import styles from '../../styles/ui.module.css'
-import { editorRootElementRef$, useTranslation } from '../core/index'
+import { editorRootElementRef$, useTranslation } from '../core/index.js'
 import {
   closeImageDialog$,
   imageAutocompleteSuggestions$,
@@ -11,8 +11,8 @@ import {
   imageUploadHandler$,
   saveImage$,
   allowSetImageDimensions$
-} from './index'
-import { DownshiftAutoComplete } from '../core/ui/DownshiftAutoComplete'
+} from './index.js'
+import { DownshiftAutoComplete } from '../core/ui/DownshiftAutoComplete.js'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 
 interface ImageFormFields {

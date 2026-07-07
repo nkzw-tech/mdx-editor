@@ -1,5 +1,5 @@
-import { CodeBlockVisitor } from './CodeBlockVisitor'
-import { MdastCodeVisitor } from './MdastCodeVisitor'
+import { CodeBlockVisitor } from './CodeBlockVisitor.js'
+import { MdastCodeVisitor } from './MdastCodeVisitor.js'
 import {
   Appender,
   addActivePlugin$,
@@ -9,15 +9,15 @@ import {
   codeBlockEditorDescriptors$,
   defaultCodeBlockLanguage$,
   insertDecoratorNode$
-} from '../core'
-import { $createCodeBlockNode, CodeBlockNode, CreateCodeBlockNodeOptions } from './CodeBlockNode'
-import { VoidEmitter } from '../../utils/voidEmitter'
+} from '../core/index.js'
+import { $createCodeBlockNode, CodeBlockNode, CreateCodeBlockNodeOptions } from './CodeBlockNode.js'
+import { VoidEmitter } from '../../utils/voidEmitter.js'
 import { Signal, map, withLatestFrom } from '@mdxeditor/gurx'
-import { realmPlugin } from '../../RealmWithPlugins'
-export * from './CodeBlockNode'
+import { realmPlugin } from '../../RealmWithPlugins.js'
+export * from './CodeBlockNode.js'
 
-export type { CodeBlockEditorContextValue, CreateCodeBlockNodeOptions } from './CodeBlockNode'
-export { useCodeBlockEditorContext } from './CodeBlockNode'
+export type { CodeBlockEditorContextValue, CreateCodeBlockNodeOptions } from './CodeBlockNode.js'
+export { useCodeBlockEditorContext } from './CodeBlockNode.js'
 export { defaultCodeBlockLanguage$ }
 
 /**

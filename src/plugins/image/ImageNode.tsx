@@ -12,7 +12,7 @@ import type {
 } from 'lexical'
 
 import { DecoratorNode } from 'lexical'
-import { ImageEditor } from './ImageEditor'
+import { ImageEditor } from './ImageEditor.js'
 import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx'
 
 function convertImageElement(domNode: Node): null | DOMConversionOutput {

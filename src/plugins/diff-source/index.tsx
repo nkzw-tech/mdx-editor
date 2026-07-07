@@ -1,8 +1,8 @@
 import { Extension } from '@codemirror/state'
-import { ViewMode, addEditorWrapper$, viewMode$ } from '../core'
-import { DiffSourceWrapper } from './DiffSourceWrapper'
+import { ViewMode, addEditorWrapper$, viewMode$ } from '../core/index.js'
+import { DiffSourceWrapper } from './DiffSourceWrapper.js'
 import { Cell } from '@mdxeditor/gurx'
-import { realmPlugin } from '../../RealmWithPlugins'
+import { realmPlugin } from '../../RealmWithPlugins.js'
 
 /** @internal */
 export const diffMarkdown$ = Cell('')

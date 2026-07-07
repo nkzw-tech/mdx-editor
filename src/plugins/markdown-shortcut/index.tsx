@@ -20,10 +20,10 @@ import {
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin'
 import { $createHeadingNode, $isHeadingNode, HeadingNode, HeadingTagType } from '@lexical/rich-text'
 import { ElementNode, LexicalNode } from 'lexical'
-import { realmPlugin } from '../../RealmWithPlugins'
-import { $createCodeBlockNode, CodeBlockNode } from '../codeblock/CodeBlockNode'
-import { activePlugins$, addComposerChild$, addNestedEditorChild$, addTableCellEditorChild$ } from '../core'
-import { HEADING_LEVEL, allowedHeadingLevels$ } from '../headings'
+import { realmPlugin } from '../../RealmWithPlugins.js'
+import { $createCodeBlockNode, CodeBlockNode } from '../codeblock/CodeBlockNode.js'
+import { activePlugins$, addComposerChild$, addNestedEditorChild$, addTableCellEditorChild$ } from '../core/index.js'
+import { HEADING_LEVEL, allowedHeadingLevels$ } from '../headings/index.js'
 import { $createHorizontalRuleNode, $isHorizontalRuleNode, HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
 
 /**

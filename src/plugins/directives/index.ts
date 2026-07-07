@@ -1,4 +1,4 @@
-import { realmPlugin } from '../../RealmWithPlugins'
+import { realmPlugin } from '../../RealmWithPlugins.js'
 import {
   addExportVisitor$,
   addImportVisitor$,
@@ -8,15 +8,15 @@ import {
   addToMarkdownExtension$,
   directiveDescriptors$,
   insertDecoratorNode$
-} from '../core'
+} from '../core/index.js'
 import { Signal, map } from '@mdxeditor/gurx'
 import { LexicalEditor } from 'lexical'
 import { Directives, directiveFromMarkdown, directiveToMarkdown } from 'mdast-util-directive'
 import { directive } from 'micromark-extension-directive'
-import { $createDirectiveNode, DirectiveNode } from './DirectiveNode'
-import { DirectiveVisitor } from './DirectiveVisitor'
-import { MdastDirectiveVisitor } from './MdastDirectiveVisitor'
-export * from './DirectiveNode'
+import { $createDirectiveNode, DirectiveNode } from './DirectiveNode.js'
+import { DirectiveVisitor } from './DirectiveVisitor.js'
+import { MdastDirectiveVisitor } from './MdastDirectiveVisitor.js'
+export * from './DirectiveNode.js'
 
 /**
  * Implement this interface to create a custom editor for markdown directives.

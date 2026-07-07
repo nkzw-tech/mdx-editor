@@ -1,6 +1,6 @@
 import React from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { GenericJsxEditor, JsxComponentDescriptor, MDXEditor, MDXEditorMethods, jsxPlugin } from '../core'
+import { GenericJsxEditor, JsxComponentDescriptor, MDXEditor, MDXEditorMethods, jsxPlugin } from '../core.js'
 import { render, act, waitFor } from '@testing-library/react'
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access

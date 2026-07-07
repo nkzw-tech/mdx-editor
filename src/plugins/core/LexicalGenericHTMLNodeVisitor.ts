@@ -1,6 +1,6 @@
 import { MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-util-mdx-jsx'
-import { $isGenericHTMLNode, GenericHTMLNode } from './GenericHTMLNode'
-import { LexicalExportVisitor } from '../../exportMarkdownFromLexical'
+import { $isGenericHTMLNode, GenericHTMLNode } from './GenericHTMLNode.js'
+import { LexicalExportVisitor } from '../../exportMarkdownFromLexical.js'
 
 export const LexicalGenericHTMLVisitor: LexicalExportVisitor<GenericHTMLNode, MdxJsxFlowElement | MdxJsxTextElement> = {
   testLexicalNode: $isGenericHTMLNode,

@@ -16,11 +16,11 @@ import {
   type LexicalNode,
   type RangeSelection
 } from 'lexical'
-import { realmPlugin } from '../../RealmWithPlugins'
-import { IS_APPLE } from '../../utils/detectMac'
-import { getSelectedNode, getSelectionRectangle } from '../../utils/lexicalHelpers'
-import { activeEditor$, addComposerChild$, createActiveEditorSubscription$, currentSelection$, readOnly$, viewMode$ } from '../core'
-import { LinkDialog } from './LinkDialog'
+import { realmPlugin } from '../../RealmWithPlugins.js'
+import { IS_APPLE } from '../../utils/detectMac.js'
+import { getSelectedNode, getSelectionRectangle } from '../../utils/lexicalHelpers.js'
+import { activeEditor$, addComposerChild$, createActiveEditorSubscription$, currentSelection$, readOnly$, viewMode$ } from '../core/index.js'
+import { LinkDialog } from './LinkDialog.js'
 import { $findMatchingParent } from '@lexical/utils'
 
 /**

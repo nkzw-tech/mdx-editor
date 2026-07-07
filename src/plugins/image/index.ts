@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-deprecated */
-import { ImagePlaceholder } from '@/plugins/image/ImagePlaceholder'
+import { ImagePlaceholder } from './ImagePlaceholder.js'
 import { $wrapNodeInElement, mergeRegister } from '@lexical/utils'
 import React, { JSX } from 'react'
 import { Action, Cell, Realm, Signal, map, mapTo, useCellValues, usePublisher, withLatestFrom } from '@mdxeditor/gurx'
@@ -24,8 +24,8 @@ import {
   PASTE_COMMAND,
   createCommand
 } from 'lexical'
-import { realmPlugin } from '../../RealmWithPlugins'
-import { CAN_USE_DOM } from '../../utils/detectMac'
+import { realmPlugin } from '../../RealmWithPlugins.js'
+import { CAN_USE_DOM } from '../../utils/detectMac.js'
 import {
   activeEditor$,
   addComposerChild$,
@@ -35,15 +35,15 @@ import {
   createActiveEditorSubscription$,
   editorRootElementRef$,
   readOnly$
-} from '../core'
-import { EditImageToolbar, EditImageToolbarProps } from './EditImageToolbar'
-import { ImageDialog } from './ImageDialog'
-import { $createImageNode, $isImageNode, CreateImageNodeParameters, ImageNode } from './ImageNode'
-import { LexicalImageVisitor } from './LexicalImageVisitor'
-import { MdastHtmlImageVisitor, MdastImageVisitor, MdastJsxImageVisitor } from './MdastImageVisitor'
+} from '../core/index.js'
+import { EditImageToolbar, EditImageToolbarProps } from './EditImageToolbar.js'
+import { ImageDialog } from './ImageDialog.js'
+import { $createImageNode, $isImageNode, CreateImageNodeParameters, ImageNode } from './ImageNode.js'
+import { LexicalImageVisitor } from './LexicalImageVisitor.js'
+import { MdastHtmlImageVisitor, MdastImageVisitor, MdastJsxImageVisitor } from './MdastImageVisitor.js'
 import styles from '../../styles/ui.module.css'
 
-export * from './ImageNode'
+export * from './ImageNode.js'
 
 /**
  * @group Image

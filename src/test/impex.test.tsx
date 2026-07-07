@@ -1,6 +1,6 @@
 import React from 'react'
 import { expect } from 'vitest'
-import { MDXEditor, MDXEditorMethods } from '../core'
+import { MDXEditor, MDXEditorMethods } from '../core.js'
 import { render } from '@testing-library/react'
 import { describe, it } from 'vitest'
 

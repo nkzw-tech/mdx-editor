@@ -1,9 +1,9 @@
 import React from 'react'
-import { openNewImageDialog$ } from '../../image'
+import { openNewImageDialog$ } from '../../image/index.js'
 import * as RadixToolbar from '@radix-ui/react-toolbar'
 import styles from '../../../styles/ui.module.css'
-import { iconComponentFor$, readOnly$, useTranslation } from '../../core/index'
-import { TooltipWrap } from '../primitives/TooltipWrap'
+import { iconComponentFor$, readOnly$, useTranslation } from '../../core/index.js'
+import { TooltipWrap } from '../primitives/TooltipWrap.js'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 
 /**

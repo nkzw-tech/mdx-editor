@@ -9,8 +9,8 @@ import {
   IS_SUBSCRIPT,
   IS_SUPERSCRIPT,
   IS_UNDERLINE
-} from '../../FormatConstants'
-import { LexicalExportVisitor } from '../../exportMarkdownFromLexical'
+} from '../../FormatConstants.js'
+import { LexicalExportVisitor } from '../../exportMarkdownFromLexical.js'
 import { type MdxJsxTextElement } from 'mdast-util-mdx-jsx'
 
 export function isMdastText(mdastNode: Mdast.Nodes): mdastNode is Mdast.Text {

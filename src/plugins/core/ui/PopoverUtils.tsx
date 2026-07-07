@@ -1,6 +1,6 @@
 import React from 'react'
 import * as RadixPopover from '@radix-ui/react-popover'
-import { editorRootElementRef$ } from '..'
+import { editorRootElementRef$ } from '../index.js'
 import styles from '../../../styles/ui.module.css'
 import { useCellValue } from '@mdxeditor/gurx'
 

@@ -4,8 +4,8 @@ import { EditorView, lineNumbers } from '@codemirror/view'
 import { basicLight } from 'cm6-theme-basic-light'
 import { basicSetup } from 'codemirror'
 import React from 'react'
-import { cmExtensions$ } from '.'
-import { markdown$, markdownSourceEditorValue$, onBlur$, readOnly$ } from '../core'
+import { cmExtensions$ } from './index.js'
+import { markdown$, markdownSourceEditorValue$, onBlur$, readOnly$ } from '../core/index.js'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 
 export const COMMON_STATE_CONFIG_EXTENSIONS: Extension[] = [

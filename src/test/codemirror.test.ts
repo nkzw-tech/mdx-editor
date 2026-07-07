@@ -4,7 +4,7 @@ import {
   normalizeCodeBlockLanguages,
   EMPTY_VALUE,
   type CodeBlockLanguageSupport
-} from '../plugins/codemirror'
+} from '../plugins/codemirror/index.js'
 
 describe('normalizeCodeBlockLanguages', () => {
   describe('record format', () => {

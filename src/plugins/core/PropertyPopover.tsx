@@ -5,8 +5,8 @@ import { useForm } from 'react-hook-form'
 import styles from '../../styles/ui.module.css'
 
 import { useCellValue } from '@mdxeditor/gurx'
-import { iconComponentFor$ } from '.'
-import { PopoverContent, PopoverPortal } from './ui/PopoverUtils'
+import { iconComponentFor$ } from './index.js'
+import { PopoverContent, PopoverPortal } from './ui/PopoverUtils.js'
 
 /**
  * A React component that can be used in custom editors to edit the properties of the node.

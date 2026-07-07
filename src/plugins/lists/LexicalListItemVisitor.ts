@@ -1,6 +1,6 @@
 import { $isListItemNode, $isListNode, ListItemNode, ListNode } from '@lexical/list'
 import * as Mdast from 'mdast'
-import { LexicalExportVisitor } from '../../exportMarkdownFromLexical'
+import { LexicalExportVisitor } from '../../exportMarkdownFromLexical.js'
 import { $isElementNode, $isTextNode, $isDecoratorNode, $isLineBreakNode } from 'lexical'
 
 export const LexicalListItemVisitor: LexicalExportVisitor<ListItemNode, Mdast.ListItem> = {

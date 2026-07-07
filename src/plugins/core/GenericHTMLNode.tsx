@@ -10,7 +10,7 @@ import {
   Spread
 } from 'lexical'
 import { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
-import { MdxNodeType, htmlTags } from './MdastHTMLNode'
+import { MdxNodeType, htmlTags } from './MdastHTMLNode.js'
 
 /**
  * All recognized HTML tags.

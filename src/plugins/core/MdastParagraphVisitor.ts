@@ -1,7 +1,7 @@
 import { $isListItemNode } from '@lexical/list'
 import { $createParagraphNode, $createLineBreakNode, type ElementNode } from 'lexical'
 import * as Mdast from 'mdast'
-import { MdastImportVisitor } from '../../importMarkdownToLexical'
+import { MdastImportVisitor } from '../../importMarkdownToLexical.js'
 
 const lexicalTypesThatShouldSkipParagraphs = ['admonition']
 

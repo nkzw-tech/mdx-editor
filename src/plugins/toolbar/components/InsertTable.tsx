@@ -1,8 +1,8 @@
-import { ButtonWithTooltip } from '.././primitives/toolbar'
+import { ButtonWithTooltip } from '.././primitives/toolbar.js'
 import React from 'react'
-import { insertTable$ } from '../../table'
+import { insertTable$ } from '../../table/index.js'
 import { useCellValue, usePublisher } from '@mdxeditor/gurx'
-import { editorInTable$, iconComponentFor$, useTranslation } from '../../core'
+import { editorInTable$, iconComponentFor$, useTranslation } from '../../core/index.js'
 
 /**
  * A toolbar button that allows the user to insert a table.

@@ -1,7 +1,7 @@
 import type { MdxJsxAttribute } from 'mdast-util-mdx'
-import { MdastImportVisitor } from '../../importMarkdownToLexical'
-import { $createGenericHTMLNode } from './GenericHTMLNode'
-import { isMdastHTMLNode, MdastHTMLNode } from './MdastHTMLNode'
+import { MdastImportVisitor } from '../../importMarkdownToLexical.js'
+import { $createGenericHTMLNode } from './GenericHTMLNode.js'
+import { isMdastHTMLNode, MdastHTMLNode } from './MdastHTMLNode.js'
 
 export const MdastHTMLVisitor: MdastImportVisitor<MdastHTMLNode> = {
   testNode: isMdastHTMLNode,

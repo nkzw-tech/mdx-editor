@@ -9,8 +9,8 @@ import {
   KEY_ENTER_COMMAND,
   type LexicalEditor
 } from 'lexical'
-import { createRootEditorSubscription$ } from './plugins/core'
-import { realmPlugin } from './RealmWithPlugins'
+import { createRootEditorSubscription$ } from './plugins/core/index.js'
+import { realmPlugin } from './RealmWithPlugins.js'
 
 export const registerHorizontalRuleOnEnter = (editor: LexicalEditor) =>
   editor.registerCommand(

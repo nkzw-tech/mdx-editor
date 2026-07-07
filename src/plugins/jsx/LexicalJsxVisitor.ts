@@ -1,9 +1,9 @@
 import { MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-util-mdx-jsx'
-import { $isLexicalJsxNode, LexicalJsxNode } from './LexicalJsxNode'
-import { LexicalExportVisitor } from '../../exportMarkdownFromLexical'
+import { $isLexicalJsxNode, LexicalJsxNode } from './LexicalJsxNode.js'
+import { LexicalExportVisitor } from '../../exportMarkdownFromLexical.js'
 import * as Mdast from 'mdast'
-import { isMdastJsxNode } from '.'
-import { isHtmlTagName } from './jsxTagName'
+import { isMdastJsxNode } from './index.js'
+import { isHtmlTagName } from './jsxTagName.js'
 
 export const LexicalJsxVisitor: LexicalExportVisitor<LexicalJsxNode, MdxJsxFlowElement | MdxJsxTextElement> = {
   testLexicalNode: $isLexicalJsxNode,

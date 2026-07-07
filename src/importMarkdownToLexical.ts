@@ -5,10 +5,10 @@ import { fromMarkdown, type Extension as FromMarkdownExtension } from 'mdast-uti
 import { MdxjsEsm } from 'mdast-util-mdx'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { ParseOptions } from 'micromark-util-types'
-import { FORMAT } from './FormatConstants'
-import { CodeBlockEditorDescriptor } from './plugins/codeblock'
-import { DirectiveDescriptor } from './plugins/directives'
-import { JsxComponentDescriptor } from './plugins/jsx'
+import { FORMAT } from './FormatConstants.js'
+import { CodeBlockEditorDescriptor } from './plugins/codeblock/index.js'
+import { DirectiveDescriptor } from './plugins/directives/index.js'
+import { JsxComponentDescriptor } from './plugins/jsx/index.js'
 
 export interface ImportStatement {
   source: string

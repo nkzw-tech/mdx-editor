@@ -1,8 +1,8 @@
 import { $createParagraphNode, ElementNode, RootNode } from 'lexical'
 import { MdxJsxTextElement } from 'mdast-util-mdx'
 import { MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
-import { $createLexicalJsxNode } from './LexicalJsxNode'
-import { MdastImportVisitor } from '../../importMarkdownToLexical'
+import { $createLexicalJsxNode } from './LexicalJsxNode.js'
+import { MdastImportVisitor } from '../../importMarkdownToLexical.js'
 
 export const MdastMdxJsxElementVisitor: MdastImportVisitor<MdxJsxTextElement | MdxJsxFlowElement> = {
   testNode: (node, { jsxComponentDescriptors }) => {

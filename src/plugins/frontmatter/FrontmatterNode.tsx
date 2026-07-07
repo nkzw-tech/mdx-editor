@@ -1,6 +1,6 @@
 import { DecoratorNode, EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import React, { JSX } from 'react'
-import { FrontmatterEditor } from './FrontmatterEditor'
+import { FrontmatterEditor } from './FrontmatterEditor.js'
 
 /**
  * A serialized representation of an {@link FrontmatterNode}.

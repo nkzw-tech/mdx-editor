@@ -1,6 +1,6 @@
 import { $isParagraphNode, ParagraphNode } from 'lexical'
 import * as Mdast from 'mdast'
-import { LexicalExportVisitor } from '../../exportMarkdownFromLexical'
+import { LexicalExportVisitor } from '../../exportMarkdownFromLexical.js'
 
 export const LexicalParagraphVisitor: LexicalExportVisitor<ParagraphNode, Mdast.Paragraph> = {
   testLexicalNode: $isParagraphNode,

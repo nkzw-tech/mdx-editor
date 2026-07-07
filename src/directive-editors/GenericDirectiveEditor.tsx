@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { PhrasingContent } from 'mdast'
 import React from 'react'
-import { NestedLexicalEditor, useMdastNodeUpdater } from '../plugins/core/NestedLexicalEditor'
-import { PropertyPopover } from '../plugins/core/PropertyPopover'
+import { NestedLexicalEditor, useMdastNodeUpdater } from '../plugins/core/NestedLexicalEditor.js'
+import { PropertyPopover } from '../plugins/core/PropertyPopover.js'
 import styles from '../styles/ui.module.css'
-import { DirectiveEditorProps } from '../plugins/directives'
+import { DirectiveEditorProps } from '../plugins/directives/index.js'
 import { Directives } from 'mdast-util-directive'
 
 /**

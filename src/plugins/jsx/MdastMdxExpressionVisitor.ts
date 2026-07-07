@@ -1,7 +1,7 @@
 import { ElementNode } from 'lexical'
 import { MdxFlowExpression, MdxTextExpression } from 'mdast-util-mdx'
-import { MdastImportVisitor } from '../../importMarkdownToLexical'
-import { $createLexicalMdxExpressionNode } from './LexicalMdxExpressionNode'
+import { MdastImportVisitor } from '../../importMarkdownToLexical.js'
+import { $createLexicalMdxExpressionNode } from './LexicalMdxExpressionNode.js'
 
 export const MdastMdxExpressionVisitor: MdastImportVisitor<MdxTextExpression | MdxFlowExpression> = {
   testNode: (node) => node.type === 'mdxTextExpression' || node.type === 'mdxFlowExpression',

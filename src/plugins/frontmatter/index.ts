@@ -1,4 +1,4 @@
-import { realmPlugin } from '../../RealmWithPlugins'
+import { realmPlugin } from '../../RealmWithPlugins.js'
 import {
   addExportVisitor$,
   addImportVisitor$,
@@ -8,7 +8,7 @@ import {
   addToMarkdownExtension$,
   createRootEditorSubscription$,
   rootEditor$
-} from '../core'
+} from '../core/index.js'
 import { Action, Cell, withLatestFrom } from '@mdxeditor/gurx'
 import {
   $getRoot,
@@ -22,10 +22,10 @@ import {
 } from 'lexical'
 import { frontmatterFromMarkdown, frontmatterToMarkdown } from 'mdast-util-frontmatter'
 import { frontmatter } from 'micromark-extension-frontmatter'
-import { $createFrontmatterNode, $isFrontmatterNode, FrontmatterNode } from './FrontmatterNode'
-import { LexicalFrontmatterVisitor } from './LexicalFrontmatterVisitor'
-import { MdastFrontmatterVisitor } from './MdastFrontmatterVisitor'
-export * from './FrontmatterNode'
+import { $createFrontmatterNode, $isFrontmatterNode, FrontmatterNode } from './FrontmatterNode.js'
+import { LexicalFrontmatterVisitor } from './LexicalFrontmatterVisitor.js'
+import { MdastFrontmatterVisitor } from './MdastFrontmatterVisitor.js'
+export * from './FrontmatterNode.js'
 
 /**
  * Whether the frontmatter dialog is open.
