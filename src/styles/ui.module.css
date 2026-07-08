@@ -997,7 +997,7 @@
 
   & > tbody > tr > td:not(.toolCell),
   & > tbody > tr > th:not(.toolCell):not([data-tool-cell='true']) {
-    border: 1px solid var(--baseBgActive);
+    border: 1px solid var(--mdx-editor-table-border);
     padding: var(--spacing-1) var(--spacing-2);
     white-space: normal;
 
@@ -1203,13 +1203,13 @@
 }
 
 .addRowButton {
-  border-top: 1px solid var(--baseBgActive);
+  border-top: 1px solid var(--mdx-editor-table-border);
   width: 100%;
   min-height: 24px;
 }
 
 .addColumnButton {
-  border-left: 1px solid var(--baseBgActive);
+  border-left: 1px solid var(--mdx-editor-table-border);
   width: 24px;
   height: 100%;
 }

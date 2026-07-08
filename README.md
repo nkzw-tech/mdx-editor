@@ -89,7 +89,7 @@ Defaults reproduce the original Notes document editor. Override variables on the
 }
 ```
 
-The primary variables are `--mdx-editor-bg`, `--mdx-editor-border`, `--mdx-editor-text`, `--mdx-editor-muted`, `--mdx-editor-accent`, `--mdx-editor-accent-contrast`, `--mdx-editor-accent-soft`, `--mdx-editor-annotation-bg`, `--mdx-editor-annotation-active-bg`, `--mdx-editor-code-bg`, `--mdx-editor-hover`, `--mdx-editor-selection`, `--mdx-editor-table-stripe`, `--mdx-editor-font`, `--mdx-editor-mono-font`, `--mdx-editor-radius`, `--mdx-editor-padding`, `--mdx-editor-font-size`, and `--mdx-editor-line-height`.
+The primary variables are `--mdx-editor-bg`, `--mdx-editor-border`, `--mdx-editor-text`, `--mdx-editor-muted`, `--mdx-editor-accent`, `--mdx-editor-accent-contrast`, `--mdx-editor-accent-soft`, `--mdx-editor-annotation-bg`, `--mdx-editor-annotation-active-bg`, `--mdx-editor-code-bg`, `--mdx-editor-hover`, `--mdx-editor-selection`, `--mdx-editor-table-border`, `--mdx-editor-table-stripe`, `--mdx-editor-font`, `--mdx-editor-mono-font`, `--mdx-editor-radius`, `--mdx-editor-padding`, `--mdx-editor-font-size`, and `--mdx-editor-line-height`.
 
 ## Advanced API
 

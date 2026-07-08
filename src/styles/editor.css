@@ -15,6 +15,7 @@
   --mdx-editor-default-muted: rgb(17 17 17 / 0.48);
   --mdx-editor-default-popover-bg: #fff;
   --mdx-editor-default-selection: rgb(61 135 245 / 0.1);
+  --mdx-editor-default-table-border: rgb(17 17 17 / 0.12);
   --mdx-editor-default-table-stripe: rgb(127 127 127 / 0.035);
   --mdx-editor-default-text: #111;
   --mdx-editor-accent: var(--mdx-editor-default-accent);
@@ -39,6 +40,7 @@
   --mdx-editor-popover-bg: var(--mdx-editor-default-popover-bg);
   --mdx-editor-radius: 28px;
   --mdx-editor-selection: var(--mdx-editor-default-selection);
+  --mdx-editor-table-border: var(--mdx-editor-default-table-border);
   --mdx-editor-table-stripe: var(--mdx-editor-default-table-stripe);
   --mdx-editor-text: var(--mdx-editor-default-text);
   color: var(--mdx-editor-text);
@@ -56,6 +58,7 @@
   --mdx-editor-default-muted: rgb(230 230 230 / 0.48);
   --mdx-editor-default-popover-bg: rgb(38 38 38);
   --mdx-editor-default-selection: rgb(61 135 245 / 0.14);
+  --mdx-editor-default-table-border: rgb(230 230 230 / 0.12);
   --mdx-editor-default-table-stripe: rgb(255 255 255 / 0.025);
   --mdx-editor-default-text: rgb(230 230 230);
 }
@@ -71,6 +74,7 @@
     --mdx-editor-default-muted: rgb(230 230 230 / 0.48);
     --mdx-editor-default-popover-bg: rgb(38 38 38);
     --mdx-editor-default-selection: rgb(61 135 245 / 0.14);
+    --mdx-editor-default-table-border: rgb(230 230 230 / 0.12);
     --mdx-editor-default-table-stripe: rgb(255 255 255 / 0.025);
     --mdx-editor-default-text: rgb(230 230 230);
   }
@@ -416,7 +420,7 @@
 }
 
 .mdx-editor-content table {
-  border-collapse: separate;
+  border-collapse: collapse;
   border-spacing: 0;
   font-size: 12px;
   margin: 24px 0;
@@ -425,7 +429,7 @@
 
 .mdx-editor-content th,
 .mdx-editor-content td {
-  border-bottom: 1px solid var(--mdx-editor-border);
+  border-bottom: 1px solid var(--mdx-editor-table-border);
   line-height: 1.45;
   padding: 12px;
   text-align: left;
