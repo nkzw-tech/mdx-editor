@@ -1,4 +1,5 @@
 import type {
+  CSSProperties,
   FocusEvent as ReactFocusEvent,
   KeyboardEvent as ReactKeyboardEvent,
   MouseEvent as ReactMouseEvent,
@@ -119,7 +120,12 @@ const normalizeMarkdownImageAttributes = (markdown: string) =>
 
 export type MarkdownEditorColorScheme = 'dark' | 'inherit' | 'light' | 'system'
 export type MarkdownEditorDensity = 'compact' | 'document'
+export type MarkdownEditorReadOnlyTextWrap = 'pretty' | 'stable' | 'wrap'
 export type MarkdownEditorVariant = 'card' | 'embedded' | 'plain'
+
+type MarkdownEditorShellStyle = CSSProperties & {
+  '--mdx-editor-read-only-text-wrap'?: MarkdownEditorReadOnlyTextWrap
+}
 
 export type MarkdownEditorHandle = {
   createAnnotation: (
@@ -173,6 +179,7 @@ export type MarkdownEditorProps = {
   overlayContainer?: HTMLElement | null
   placeholder?: ReactNode
   readOnly?: boolean
+  readOnlyTextWrap?: MarkdownEditorReadOnlyTextWrap
   resolveLink?: (href: string) => string | null
   spellCheck?: boolean
   suppressHtmlProcessing?: boolean
@@ -333,6 +340,7 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
       overlayContainer,
       placeholder,
       readOnly = false,
+      readOnlyTextWrap,
       resolveLink,
       spellCheck = true,
       suppressHtmlProcessing = false,
@@ -474,6 +482,14 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
       resolvedColorScheme === 'dark' && 'dark-theme',
       className
     )
+    const shellStyle: MarkdownEditorShellStyle = {}
+    if (minHeight !== undefined) {
+      shellStyle.minHeight = minHeight
+    }
+    if (readOnly && readOnlyTextWrap !== undefined) {
+      shellStyle['--mdx-editor-read-only-text-wrap'] = readOnlyTextWrap
+    }
+    const hasShellStyle = Object.keys(shellStyle).length > 0
 
     return (
       <div
@@ -481,12 +497,13 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
         data-color-scheme={resolvedColorScheme}
         data-density={density}
         data-read-only={readOnly ? 'true' : undefined}
+        data-read-only-text-wrap={readOnly ? readOnlyTextWrap : undefined}
         data-variant={variant}
         onClickCapture={handleLinkClick}
         onFocusCapture={onFocus}
         onKeyDownCapture={onKeyDown}
         ref={shellRef}
-        style={minHeight === undefined ? undefined : { minHeight }}
+        style={hasShellStyle ? shellStyle : undefined}
       >
         <MDXEditor
           activeAnnotationId={activeAnnotationId}

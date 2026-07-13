@@ -319,4 +319,48 @@ describe('MarkdownEditor defaults', () => {
     )
     expect(container.querySelector('.mdx-editor-content table col[data-tool-column]')).toBeNull()
   })
+
+  test('only applies the configured text wrapping in read-only mode', () => {
+    const { container, rerender } = render(
+      <MarkdownEditor
+        colorScheme="light"
+        defaultValue="A paragraph with wrapping."
+        readOnlyTextWrap="pretty"
+      />
+    )
+    const getShell = () =>
+      container.querySelector<HTMLElement>('.mdx-editor-shell')
+
+    expect(getShell()).not.toHaveStyle({
+      '--mdx-editor-read-only-text-wrap': 'pretty'
+    })
+    expect(getShell()).not.toHaveAttribute('data-read-only-text-wrap')
+
+    rerender(
+      <MarkdownEditor
+        colorScheme="light"
+        defaultValue="A paragraph with wrapping."
+        readOnly
+      />
+    )
+
+    expect(getShell()).not.toHaveStyle({
+      '--mdx-editor-read-only-text-wrap': 'pretty'
+    })
+    expect(getShell()).not.toHaveAttribute('data-read-only-text-wrap')
+
+    rerender(
+      <MarkdownEditor
+        colorScheme="light"
+        defaultValue="A paragraph with wrapping."
+        readOnly
+        readOnlyTextWrap="pretty"
+      />
+    )
+
+    expect(getShell()).toHaveStyle({
+      '--mdx-editor-read-only-text-wrap': 'pretty'
+    })
+    expect(getShell()).toHaveAttribute('data-read-only-text-wrap', 'pretty')
+  })
 })

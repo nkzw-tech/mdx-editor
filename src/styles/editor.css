@@ -223,7 +223,6 @@
 .mdx-editor-content li {
   font-size: var(--mdx-editor-font-size);
   line-height: var(--mdx-editor-line-height);
-  text-wrap: pretty;
 }
 
 .mdx-editor-content p {
@@ -571,6 +570,15 @@
 
 .mdx-editor-shell[data-read-only='true'] .mdx-editor-content {
   overflow-x: auto;
+}
+
+.mdx-editor-shell[data-read-only='true'][data-read-only-text-wrap]
+  .mdx-editor-content
+  p,
+.mdx-editor-shell[data-read-only='true'][data-read-only-text-wrap]
+  .mdx-editor-content
+  li {
+  text-wrap: var(--mdx-editor-read-only-text-wrap);
 }
 
 .mdx-editor-shell[data-read-only='true'] .mdx-editor-content table {

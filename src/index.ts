@@ -6,6 +6,7 @@ export {
   type MarkdownEditorDensity,
   type MarkdownEditorHandle,
   type MarkdownEditorProps,
+  type MarkdownEditorReadOnlyTextWrap,
   type MarkdownEditorVariant
 } from './MarkdownEditor.js'
 export type {
