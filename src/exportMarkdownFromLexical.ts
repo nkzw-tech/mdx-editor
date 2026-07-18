@@ -120,7 +120,7 @@ export function exportLexicalTreeToMdast({
   const referredComponents = new Set<string>()
   const knownImportSources = new Map<string, ImportStatement>()
 
-  visitors = visitors.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
+  visitors = [...visitors].sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
 
   visit(root, null)
 

@@ -1,18 +1,15 @@
 import {
+  $createParagraphNode,
   $getRoot,
   $getSelection,
   $isRangeSelection,
-  $isTextNode,
-  $isElementNode,
+  createEditor,
   ElementNode,
   LexicalEditor,
-  LexicalNode,
   RangeSelection,
   TextNode
 } from 'lexical'
-import { $isLinkNode } from '@lexical/link'
-import { $isHeadingNode } from '@lexical/rich-text'
-import { $isListNode, $isListItemNode } from '@lexical/list'
+import { $generateJSONFromSelectedNodes, $generateNodesFromSerializedNodes } from '@lexical/clipboard'
 import { $isAtNodeEnd } from '@lexical/selection'
 import { tap } from './fp.js'
 import { ExportMarkdownFromLexicalOptions, exportMarkdownFromLexical } from '../exportMarkdownFromLexical.js'
@@ -162,118 +159,77 @@ export function getStateAsMarkdown(editor: LexicalEditor, exportParams: Omit<Exp
 /**
  * Gets the markdown representation of the current selection in the Lexical editor.
  * Returns an empty string if there is no selection or if the selection is collapsed.
- * Converts selected nodes to markdown by recursively processing them and preserving formatting.
- * Note: Selects entire nodes, not partial selections within nodes.
+ * Uses the same visitors and serialization options as the editor's full markdown export.
  * @group Utils
  */
-export function getSelectionAsMarkdown(editor: LexicalEditor, _exportParams: Omit<ExportMarkdownFromLexicalOptions, 'root'>): string {
+export function getSelectionAsMarkdown(editor: LexicalEditor, exportParams: Omit<ExportMarkdownFromLexicalOptions, 'root'>): string {
+  let temporaryEditor: LexicalEditor | null = null
+  let selectedNodes: ReturnType<typeof $generateJSONFromSelectedNodes>['nodes'] = []
   let markdown = ''
 
-  editor.getEditorState().read(() => {
-    const selection = $getSelection()
+  editor.getEditorState().read(
+    () => {
+      const selection = $getSelection()
 
-    // Return empty if no selection or collapsed
-    if (!selection || !$isRangeSelection(selection) || selection.isCollapsed()) {
-      return
-    }
+      if (!selection || ($isRangeSelection(selection) && selection.isCollapsed()) || selection.getNodes().length === 0) {
+        return
+      }
 
-    // Get all nodes in the selection (entire nodes, not partial)
-    const nodes = selection.getNodes()
+      selectedNodes = $generateJSONFromSelectedNodes(editor, selection).nodes
+      if (selectedNodes.length > 0) {
+        // A no-config editor created in this context inherits the active editor's
+        // complete registered node map, including consumer nodes and replacements.
+        temporaryEditor = createEditor()
+      }
+    },
+    { editor }
+  )
 
-    if (nodes.length === 0) {
-      return
-    }
+  const selectedTreeEditor = temporaryEditor as LexicalEditor | null
+  if (!selectedTreeEditor || selectedNodes.length === 0) {
+    return ''
+  }
 
-    // Get unique block-level parent nodes to preserve structure (headings, lists, paragraphs, etc.)
-    const parentNodes = new Set<ElementNode>()
-    nodes.forEach((node) => {
-      let current: LexicalNode | null = node
+  const exportResult: { error: unknown; failed: boolean } = { error: undefined, failed: false }
 
-      // Walk up to find the nearest block-level parent (heading, paragraph, list item, etc.)
-      while (current) {
-        // Check if current node is a block-level node
-        if ($isHeadingNode(current) || $isListItemNode(current) || current.getType() === 'paragraph' || current.getType() === 'quote') {
-          if ($isElementNode(current)) {
-            parentNodes.add(current)
+  selectedTreeEditor.update(
+    () => {
+      try {
+        const root = $getRoot()
+        const nodes = $generateNodesFromSerializedNodes(selectedNodes)
+        let inlineContainer = $createParagraphNode()
+
+        const appendInlineContainer = () => {
+          if (!inlineContainer.isEmpty()) {
+            root.append(inlineContainer)
+            inlineContainer = $createParagraphNode()
           }
-          break
         }
 
-        current = current.getParent()
+        for (const node of nodes) {
+          if (node.isInline()) {
+            inlineContainer.append(node)
+          } else {
+            appendInlineContainer()
+            root.append(node)
+          }
+        }
+        appendInlineContainer()
+
+        markdown = exportMarkdownFromLexical({ root, ...exportParams })
+      } catch (error) {
+        exportResult.failed = true
+        exportResult.error = error
       }
-    })
+    },
+    { discrete: true, skipTransforms: true }
+  )
 
-    // If we have parent nodes, use those instead of leaf nodes
-    const nodesToProcess = parentNodes.size > 0 ? Array.from(parentNodes) : nodes
+  if (exportResult.failed) {
+    throw exportResult.error
+  }
 
-    // Helper function to recursively convert a node to markdown
-    function nodeToMarkdown(node: LexicalNode): string {
-      if ($isHeadingNode(node)) {
-        // Handle heading nodes
-        const level = parseInt(node.getTag().replace('h', ''))
-        const children = node.getChildren()
-        const headingText = children.map((child) => nodeToMarkdown(child)).join('')
-        return '#'.repeat(level) + ' ' + headingText + '\n\n'
-      } else if ($isListItemNode(node)) {
-        // Handle list item nodes
-        const parent = node.getParent()
-        const prefix = parent && $isListNode(parent) && parent.getListType() === 'number' ? '1. ' : '- '
-        const children = node.getChildren()
-        const itemText = children.map((child) => nodeToMarkdown(child)).join('')
-        return prefix + itemText + '\n'
-      } else if ($isListNode(node)) {
-        // Handle list nodes
-        const children = node.getChildren()
-        return children.map((child) => nodeToMarkdown(child)).join('') + '\n'
-      } else if ($isTextNode(node)) {
-        let text = node.getTextContent()
-        const format = node.getFormat()
-
-        // Apply markdown formatting based on Lexical text format flags
-        // Bold: 1, Italic: 2, Strikethrough: 4, Underline: 8, Code: 16
-        if (format & 16) {
-          // Code
-          return `\`${text}\``
-        }
-        // Apply formatting in correct order (innermost to outermost)
-        if (format & 1) {
-          // Bold
-          text = `**${text}**`
-        }
-        if (format & 2) {
-          // Italic
-          text = `*${text}*`
-        }
-        if (format & 4) {
-          // Strikethrough
-          text = `~~${text}~~`
-        }
-
-        return text
-      } else if ($isLinkNode(node)) {
-        // Handle link nodes
-        const url = node.getURL()
-        const title = node.getTitle()
-        const children = node.getChildren()
-        const linkText = children.map((child) => nodeToMarkdown(child)).join('')
-
-        if (title) {
-          return `[${linkText}](${url} "${title}")`
-        }
-        return `[${linkText}](${url})`
-      } else if ($isElementNode(node)) {
-        // For other element nodes, process their children
-        const children = node.getChildren()
-        return children.map((child) => nodeToMarkdown(child)).join('')
-      }
-
-      // Fallback: return text content
-      return node.getTextContent()
-    }
-
-    // Convert all selected nodes to markdown and concatenate
-    markdown = nodesToProcess.map((node) => nodeToMarkdown(node)).join('')
-  })
-
-  return markdown.trim()
+  // Full-document export intentionally includes terminal line breaks. A
+  // selection result is a fragment, so remove only those structural breaks.
+  return markdown.replace(/\n+$/u, '')
 }
