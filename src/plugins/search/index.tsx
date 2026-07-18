@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { Cell, debounceTime, useCell, useCellValue, useRealm } from '@mdxeditor/gurx'
-import { $createRangeSelection, $getNearestNodeFromDOMNode, $isTextNode, getNearestEditorFromDOMNode } from 'lexical'
+import { createDOMRange } from '@lexical/selection'
+import { $createRangeSelection, $getNodeByKey, $getRoot, $isTextNode, HISTORY_PUSH_TAG, type LexicalEditor, type NodeKey } from 'lexical'
 import { realmPlugin } from '../../RealmWithPlugins.js'
-import { contentEditableRef$, createRootEditorSubscription$ } from '../core/index.js'
+import { activeEditor$, contentEditableRef$, createActiveEditorSubscription$ } from '../core/index.js'
 
 export const EmptyTextNodeIndex: TextNodeIndex = {
   allText: '',
@@ -20,7 +21,7 @@ export const editorSearchTermDebounced$ = Cell<string>('', (realm) => {
 })
 export const editorSearchScrollableContent$ = Cell<HTMLElement | null>(null, (r) =>
   r.sub(contentEditableRef$, (cref) => {
-    r.pub(editorSearchScrollableContent$, cref?.current?.parentNode ?? null)
+    r.pub(editorSearchScrollableContent$, cref?.current?.parentElement ?? null)
   })
 )
 
@@ -37,6 +38,32 @@ export const debouncedIndexer$ = Cell<TextNodeIndex>(EmptyTextNodeIndex, (realm)
   realm.link(debouncedIndexer$, realm.pipe(editorSearchTextNodeIndex$, realm.transformer(debounceTime(250))))
 })
 
+interface SearchPoint {
+  key: NodeKey
+  offset: number
+}
+
+interface SearchUnit {
+  key: NodeKey
+  startOffset: number
+  endOffset: number
+}
+
+interface SearchSnapshot {
+  editor: LexicalEditor
+  text: string
+  units: SearchUnit[]
+}
+
+interface SearchStateMatch {
+  editor: LexicalEditor
+  start: SearchPoint
+  end: SearchPoint
+}
+
+const editorSearchActiveEditor$ = Cell<LexicalEditor | null>(null)
+const editorSearchStateMatches$ = Cell<SearchStateMatch[]>([])
+
 function* searchText(allText: string, searchQuery: string): Generator<[start: number, end: number]> {
   if (!searchQuery) {
     return
@@ -45,12 +72,11 @@ function* searchText(allText: string, searchQuery: string): Generator<[start: nu
   let regex: RegExp
   try {
     regex = new RegExp(searchQuery, 'gi')
-  } catch (e) {
-    console.error('Invalid search pattern:', e)
+  } catch {
     return
   }
 
-  let match
+  let match: RegExpExecArray | null
   while ((match = regex.exec(allText)) !== null) {
     if (match[0].length === 0) {
       if (regex.lastIndex === match.index) {
@@ -59,52 +85,8 @@ function* searchText(allText: string, searchQuery: string): Generator<[start: nu
       continue
     }
 
-    const start = match.index
-    const end = start + match[0].length - 1
-    yield [start, end]
+    yield [match.index, match.index + match[0].length - 1]
   }
-}
-
-/**
- * Creates a single, unified index of all text nodes within valid content containers.
- * This allows matches to span across different block-level elements.
- */
-function indexAllTextNodes(root: HTMLElement | null): TextNodeIndex {
-  let allText = ''
-  const nodeIndex: Node[] = []
-  const offsetIndex: number[] = []
-
-  if (!root) {
-    return { allText: '', nodeIndex, offsetIndex }
-  }
-
-  // A CSS selector for all valid content-hosting elements.
-  const contentSelector = 'p, h1, h2, h3, h4, h5, h6, li, code, pre'
-
-  const treeWalker = document.createTreeWalker(
-    root,
-    NodeFilter.SHOW_TEXT,
-    // The corrected heuristic: accept any text node that is a descendant of a valid content container.
-    (node) => {
-      // Use `closest()` on the parent to see if it's inside a valid container.
-      if (node.parentElement?.closest(contentSelector)) {
-        return NodeFilter.FILTER_ACCEPT
-      }
-      return NodeFilter.FILTER_REJECT
-    }
-  )
-
-  let currentNode: Node | null
-  while ((currentNode = treeWalker.nextNode())) {
-    const nodeContent = currentNode.textContent?.normalize('NFKD') ?? currentNode.textContent ?? ''
-    for (let i = 0; i < nodeContent.length; i++) {
-      nodeIndex.push(currentNode)
-      offsetIndex.push(i)
-      allText += nodeContent[i] ?? ''
-    }
-  }
-
-  return { allText, nodeIndex, offsetIndex }
 }
 
 export function* rangeSearchScan(searchQuery: string, { allText, offsetIndex, nodeIndex }: TextNodeIndex) {
@@ -113,9 +95,9 @@ export function* rangeSearchScan(searchQuery: string, { allText, offsetIndex, no
     const endOffset = offsetIndex[end]
     const startNode = nodeIndex[start]
     const endNode = nodeIndex[end]
-    const range = new Range()
+    const ownerDocument = startNode?.ownerDocument ?? document
+    const range = ownerDocument.createRange()
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (startNode === undefined || endNode === undefined || startOffset === undefined || endOffset === undefined) {
       throw new Error('Invalid range: startNode, endNode, startOffset, or endOffset is undefined.')
     }
@@ -125,19 +107,120 @@ export function* rangeSearchScan(searchQuery: string, { allText, offsetIndex, no
     yield range
   }
 }
+
+function createSearchSnapshot(editor: LexicalEditor): SearchSnapshot {
+  let text = ''
+  const units: SearchUnit[] = []
+
+  for (const node of $getRoot().getAllTextNodes()) {
+    const nodeText = node.getTextContent()
+    let sourceOffset = 0
+
+    while (sourceOffset < nodeText.length) {
+      const codePoint = nodeText.codePointAt(sourceOffset)
+      if (codePoint === undefined) break
+
+      const sourceUnit = String.fromCodePoint(codePoint)
+      const normalizedUnit = sourceUnit.normalize('NFKD')
+      const mapsOneToOne = normalizedUnit.length === sourceUnit.length
+
+      for (let normalizedOffset = 0; normalizedOffset < normalizedUnit.length; normalizedOffset++) {
+        const startOffset = mapsOneToOne ? sourceOffset + normalizedOffset : sourceOffset
+        const endOffset = mapsOneToOne ? startOffset + 1 : sourceOffset + sourceUnit.length
+        units.push({ key: node.getKey(), startOffset, endOffset })
+        text += normalizedUnit[normalizedOffset] ?? ''
+      }
+
+      sourceOffset += sourceUnit.length
+    }
+  }
+
+  return { editor, text, units }
+}
+
+function findStateMatches(snapshot: SearchSnapshot, searchQuery: string): SearchStateMatch[] {
+  const matches: SearchStateMatch[] = []
+
+  for (const [startIndex, endIndex] of searchText(snapshot.text, searchQuery)) {
+    const startUnit = snapshot.units[startIndex]
+    const endUnit = snapshot.units[endIndex]
+    if (!startUnit || !endUnit) continue
+
+    matches.push({
+      editor: snapshot.editor,
+      start: { key: startUnit.key, offset: startUnit.startOffset },
+      end: { key: endUnit.key, offset: endUnit.endOffset }
+    })
+  }
+
+  return matches
+}
+
+function projectSnapshot(snapshot: SearchSnapshot, matches: SearchStateMatch[]) {
+  const nodeIndex: Node[] = []
+  const offsetIndex: number[] = []
+  const domTextNodes = new Map<NodeKey, Node>()
+  const projectedMatches: { match: SearchStateMatch; range: Range }[] = []
+  let projectionComplete = true
+
+  snapshot.editor.getEditorState().read(() => {
+    for (const unit of snapshot.units) {
+      let domTextNode = domTextNodes.get(unit.key)
+      if (!domTextNode) {
+        const lexicalNode = $getNodeByKey(unit.key)
+        if (!$isTextNode(lexicalNode)) {
+          projectionComplete = false
+          break
+        }
+        const nodeRange = createDOMRange(snapshot.editor, lexicalNode, 0, lexicalNode, lexicalNode.getTextContentSize())
+        if (!nodeRange || nodeRange.startContainer !== nodeRange.endContainer) {
+          projectionComplete = false
+          break
+        }
+        domTextNode = nodeRange.startContainer
+        domTextNodes.set(unit.key, domTextNode)
+      }
+      nodeIndex.push(domTextNode)
+      offsetIndex.push(unit.startOffset)
+    }
+
+    for (const match of matches) {
+      const startNode = $getNodeByKey(match.start.key)
+      const endNode = $getNodeByKey(match.end.key)
+      if (!$isTextNode(startNode) || !$isTextNode(endNode)) continue
+
+      const range = createDOMRange(snapshot.editor, startNode, match.start.offset, endNode, match.end.offset)
+      if (range) projectedMatches.push({ match, range })
+    }
+  })
+
+  return {
+    index: projectionComplete ? { allText: snapshot.text, nodeIndex, offsetIndex } : EmptyTextNodeIndex,
+    projectedMatches
+  }
+}
+
+function supportsHighlights() {
+  return typeof CSS !== 'undefined' && typeof CSS.highlights !== 'undefined' && typeof Highlight !== 'undefined'
+}
+
 const focusHighlightRange = (range?: Range | null) => {
+  if (!supportsHighlights()) return
   CSS.highlights.delete(MDX_FOCUS_SEARCH_NAME)
   if (range) CSS.highlights.set(MDX_FOCUS_SEARCH_NAME, new Highlight(range))
 }
 
 const highlightRanges = (ranges: Range[] | Iterable<Range>) => {
+  if (!supportsHighlights()) return
   CSS.highlights.set(MDX_SEARCH_NAME, new Highlight(...ranges))
 }
 
 const resetHighlights = () => {
+  if (!supportsHighlights()) return
   CSS.highlights.delete(MDX_SEARCH_NAME)
   CSS.highlights.delete(MDX_FOCUS_SEARCH_NAME)
 }
+
 const scrollToRange = (
   range: Range,
   contentEditable: HTMLElement | undefined,
@@ -147,10 +230,8 @@ const scrollToRange = (
     behavior?: ScrollBehavior
   }
 ) => {
-  // Set defaults if options or any property is undefined
   const ignoreIfInView = options?.ignoreIfInView ?? true
   const behavior = options?.behavior ?? 'smooth'
-
   const [first] = range.getClientRects()
 
   if (!contentEditable) {
@@ -162,75 +243,121 @@ const scrollToRange = (
     return
   }
 
-  // Get bounding rects relative to the scroll container
   const containerRect = contentEditable.getBoundingClientRect()
   const topRelativeToContainer = first.top - containerRect.top
   const bottomRelativeToContainer = first.bottom - containerRect.top
-  // Optionally ignore if already in view
   if (ignoreIfInView) {
-    // The visible area is [scrollTop, scrollTop + clientHeight]
-    // The range is in view if its top and bottom are within this area
     const rangeTop = topRelativeToContainer + contentEditable.scrollTop
     const rangeBottom = bottomRelativeToContainer + contentEditable.scrollTop
     const visibleTop = contentEditable.scrollTop
     const visibleBottom = visibleTop + contentEditable.clientHeight
 
-    const inView = rangeTop >= visibleTop && rangeBottom <= visibleBottom
-
-    if (inView) return
+    if (rangeTop >= visibleTop && rangeBottom <= visibleBottom) return
   }
 
-  // Scroll so the range is near the top, with some offset if desired
-  const top = topRelativeToContainer + contentEditable.scrollTop - first.height // adjust this offset as needed
-
+  const top = topRelativeToContainer + contentEditable.scrollTop - first.height
   contentEditable.scrollTo({ top, behavior })
 }
 
-function isSimilarRange(range1: Pick<Range, 'startContainer' | 'startOffset'>, range2: Pick<Range, 'startContainer' | 'startOffset'>) {
-  return range1.startContainer === range2.startContainer && range1.startOffset === range2.startOffset
+function isSameStart(first: SearchStateMatch | undefined, second: SearchStateMatch) {
+  return first?.editor === second.editor && first.start.key === second.start.key && first.start.offset === second.start.offset
 }
 
-function replaceTextInRange(range: Range, str: string, onUpdate?: () => void) {
-  const startDomNode = range.startContainer
-  const endDomNode = range.endContainer
-  const startOffset = range.startOffset
-  const endOffset = range.endOffset
+function clearSearchResults(realm: ReturnType<typeof useRealm>) {
+  realm.pubIn({
+    [editorSearchStateMatches$]: [],
+    [editorSearchRanges$]: [],
+    [editorSearchCursor$]: 0
+  })
+  resetHighlights()
+}
 
-  const editor = getNearestEditorFromDOMNode(startDomNode)
-  if (!editor) {
-    console.warn('No editor found for the provided DOM node.')
+function refreshSearch(
+  realm: ReturnType<typeof useRealm>,
+  editor: LexicalEditor,
+  advanceFrom?: { cursor: number; match: SearchStateMatch }
+) {
+  if (realm.getValue(editorSearchActiveEditor$) !== editor) return
+
+  let snapshot!: SearchSnapshot
+  editor.getEditorState().read(() => {
+    snapshot = createSearchSnapshot(editor)
+  })
+
+  const searchOpen = realm.getValue(searchOpen$)
+  const searchQuery = realm.getValue(editorSearchTerm$)
+  const stateMatches = searchOpen ? findStateMatches(snapshot, searchQuery) : []
+  const { index, projectedMatches } = projectSnapshot(snapshot, stateMatches)
+
+  if (searchOpen) {
+    realm.pub(editorSearchTextNodeIndex$, index)
+  } else {
+    realm.pub(debouncedIndexer$, index)
+  }
+
+  if (!searchOpen || !searchQuery || projectedMatches.length === 0) {
+    clearSearchResults(realm)
     return
   }
+
+  const matches = projectedMatches.map(({ match }) => match)
+  const ranges = projectedMatches.map(({ range }) => range)
+  const previousCursor = realm.getValue(editorSearchCursor$)
+  let cursor = Math.min(Math.max(previousCursor, 1), ranges.length)
+
+  if (advanceFrom && isSameStart(matches[advanceFrom.cursor - 1], advanceFrom.match)) {
+    cursor = (advanceFrom.cursor % ranges.length) + 1
+  }
+
+  realm.pubIn({
+    [editorSearchStateMatches$]: matches,
+    [editorSearchRanges$]: ranges,
+    [editorSearchCursor$]: cursor
+  })
+  highlightRanges(ranges)
+  focusHighlightRange(ranges[cursor - 1])
+}
+
+function resolveMatch(match: SearchStateMatch) {
+  const startNode = $getNodeByKey(match.start.key)
+  const endNode = $getNodeByKey(match.end.key)
+  if (!$isTextNode(startNode) || !$isTextNode(endNode)) return null
+  if (match.start.offset < 0 || match.start.offset > startNode.getTextContentSize()) return null
+  if (match.end.offset < 0 || match.end.offset > endNode.getTextContentSize()) return null
+  return { startNode, endNode }
+}
+
+function replaceStateMatches(editor: LexicalEditor, matches: SearchStateMatch[], replacement: string, onUpdate?: () => void) {
+  if (matches.length === 0 || matches.some((match) => match.editor !== editor)) return
+
   editor.update(
     () => {
-      // 1. Find the Lexical nodes corresponding to the DOM nodes in your range.
-      const startLexicalNode = $getNearestNodeFromDOMNode(startDomNode)
-      const endLexicalNode = $getNearestNodeFromDOMNode(endDomNode)
+      if (matches.some((match) => resolveMatch(match) === null)) return
 
-      // 2. Safety check: Ensure they are valid TextNodes.
-      if (!$isTextNode(startLexicalNode) || !$isTextNode(endLexicalNode)) {
-        return
-      }
-
-      // 3. Create a Lexical RangeSelection that mirrors your DOM Range.
-      try {
-        const selection = $createRangeSelection()
-        selection.anchor.set(startLexicalNode.getKey(), startOffset, 'text')
-        selection.focus.set(endLexicalNode.getKey(), endOffset, 'text')
-
-        // 4. Perform the replacement. This deletes the selected content
-        // and inserts the new string.
-        selection.insertText(str)
-      } catch (e) {
-        console.warn('Error replacing text in the editor:', e)
-        if (onUpdate) {
-          onUpdate()
+      for (let index = matches.length - 1; index >= 0; index--) {
+        const match = matches[index]
+        if (!match) continue
+        const resolved = resolveMatch(match)
+        if (!resolved) {
+          throw new Error('Search match became stale during replacement.')
         }
-        // Optionally, you can throw an error or handle it gracefully.
-        // throw new Error("Failed to replace text in the editor");
+
+        if (resolved.startNode.is(resolved.endNode)) {
+          const replacedNode = resolved.startNode.spliceText(match.start.offset, match.end.offset - match.start.offset, replacement, true)
+          if (replacedNode.getTextContentSize() === 0) {
+            replacedNode.remove()
+          }
+          continue
+        }
+
+        const selection = $createRangeSelection()
+        selection.anchor.set(resolved.startNode.getKey(), match.start.offset, 'text')
+        selection.focus.set(resolved.endNode.getKey(), match.end.offset, 'text')
+        selection.insertText(replacement)
       }
     },
     {
+      tag: HISTORY_PUSH_TAG,
       onUpdate
     }
   )
@@ -241,7 +368,7 @@ export function useEditorSearch() {
   const ranges = useCellValue(editorSearchRanges$)
   const cursor = useCellValue(editorSearchCursor$)
   const search = useCellValue(editorSearchTerm$)
-  const currentRange = ranges[cursor - 1] ?? null
+  const currentRange: Range | null = cursor > 0 ? ranges.at(cursor - 1) ?? null : null
   const contentEditable = useCellValue(editorSearchScrollableContent$)
   const [isSearchOpen, setIsSearchOpen] = useCell(searchOpen$)
 
@@ -255,13 +382,12 @@ export function useEditorSearch() {
     setIsSearchOpen(!isSearchOpen)
   }
 
-  const rangeCount = ranges.length
   const scrollToRangeOrIndex = (range: Range | number, options?: { ignoreIfInView?: boolean; behavior?: ScrollBehavior }) => {
     const scrollRange = typeof range === 'number' ? ranges[range - 1] : range
     if (!scrollRange) {
       throw new Error('Error scrolling to range, range does not exist')
     }
-    scrollToRange(scrollRange, contentEditable!, options)
+    scrollToRange(scrollRange, contentEditable ?? undefined, options)
   }
 
   const setSearch = (term: string | null) => {
@@ -269,74 +395,49 @@ export function useEditorSearch() {
       realm.pub(editorSearchCursor$, 0)
     }
     realm.pub(editorSearchTermDebounced$, term ?? '')
-    //reset cursor
   }
 
   const next = () => {
     if (!ranges.length) return
-    const newVal = (cursor % ranges.length) + 1
-    scrollToRangeOrIndex(newVal)
-    realm.pub(editorSearchCursor$, newVal)
+    const newCursor = (cursor % ranges.length) + 1
+    scrollToRangeOrIndex(newCursor)
+    realm.pub(editorSearchCursor$, newCursor)
   }
 
   const prev = () => {
     if (!ranges.length) return
-    const newVal = cursor <= 1 ? ranges.length : cursor - 1
-    scrollToRangeOrIndex(newVal)
-    realm.pub(editorSearchCursor$, newVal)
+    const newCursor = cursor <= 1 ? ranges.length : cursor - 1
+    scrollToRangeOrIndex(newCursor)
+    realm.pub(editorSearchCursor$, newCursor)
   }
 
-  const replace = (str: string, onUpdate?: () => void) => {
-    const currentRange = ranges[cursor - 1]
-    if (!currentRange) {
-      return
-    }
-    const { startContainer, startOffset } = currentRange ?? {}
-    replaceTextInRange(currentRange, str, () => {
-      //when the replaced text continues to match the search term
-      //cursor must be incremented to the next match
-      const unsub = realm.sub(editorSearchRanges$, (newRanges) => {
-        unsub()
-        if (
-          isSimilarRange(newRanges[cursor - 1] ?? {}, {
-            startOffset,
-            startContainer
-          })
-        ) {
-          realm.pub(editorSearchCursor$, (cursor + 1) % (newRanges.length + 1) || 1)
-        }
-      })
+  const replace = (replacement: string, onUpdate?: () => void) => {
+    const editor = realm.getValue(editorSearchActiveEditor$)
+    const matches = realm.getValue(editorSearchStateMatches$)
+    const match = matches[cursor - 1]
+    if (!editor || !match) return
+
+    replaceStateMatches(editor, [match], replacement, () => {
+      refreshSearch(realm, editor, { cursor, match })
       onUpdate?.()
     })
   }
 
-  const replaceAll = (str: string, onUpdate?: () => void) => {
-    const runReplaceAll = () => {
-      let ticks = 0
-      for (let i = ranges.length - 1; i >= 0; i--) {
-        const textReplaceRange = ranges[i]
-        if (!textReplaceRange) {
-          throw new Error('error replacing all text range does not exist')
-        }
-        replaceTextInRange(textReplaceRange, str, () => {
-          ticks++
-          if (ticks >= ranges.length) {
-            onUpdate?.()
-          }
-        })
-      }
-    }
-    if (typeof requestIdleCallback === 'function') {
-      requestIdleCallback(runReplaceAll)
-    } else {
-      setTimeout(runReplaceAll, 0)
-    }
+  const replaceAll = (replacement: string, onUpdate?: () => void) => {
+    const editor = realm.getValue(editorSearchActiveEditor$)
+    const matches = realm.getValue(editorSearchStateMatches$)
+    if (!editor || matches.length === 0) return
+
+    replaceStateMatches(editor, matches, replacement, () => {
+      refreshSearch(realm, editor)
+      onUpdate?.()
+    })
   }
 
   return {
     next,
     prev,
-    total: rangeCount,
+    total: ranges.length,
     cursor,
     setSearch,
     search,
@@ -354,81 +455,74 @@ export function useEditorSearch() {
 }
 
 export const searchPlugin = realmPlugin({
-  //TODO: ensure proper event cleanup
   init(realm) {
-    if (typeof CSS.highlights === 'undefined') {
-      console.warn('CSS.highlights is not supported in this browser. Search functionality will be limited.')
-      return
+    if (!supportsHighlights()) {
+      console.warn('CSS.highlights is not supported in this browser. Search highlighting will be unavailable.')
     }
+
     realm.sub(editorSearchCursor$, (cursor) => {
-      const ranges = realm.getValue(editorSearchRanges$)
-      focusHighlightRange(ranges[cursor - 1])
+      if (realm.getValue(searchOpen$)) {
+        focusHighlightRange(realm.getValue(editorSearchRanges$)[cursor - 1])
+      }
     })
 
-    const updateHighlights = (searchQuery: string, textNodeIndex: TextNodeIndex) => {
-      if (!searchQuery) {
-        realm.pub(editorSearchCursor$, 0)
-        realm.pub(editorSearchRanges$, [])
-        resetHighlights()
+    realm.sub(editorSearchTerm$, () => {
+      const editor = realm.getValue(editorSearchActiveEditor$)
+      if (editor) refreshSearch(realm, editor)
+    })
+
+    realm.sub(searchOpen$, (searchOpen) => {
+      if (!searchOpen) {
+        clearSearchResults(realm)
         return
       }
-      const ranges = Array.from(rangeSearchScan(searchQuery, textNodeIndex))
-      realm.pub(editorSearchRanges$, ranges)
-      highlightRanges(ranges)
-      if (ranges.length) {
-        const currentCursor = realm.getValue(editorSearchCursor$) || 1
-        focusHighlightRange(ranges[currentCursor - 1])
-        realm.pub(editorSearchCursor$, currentCursor)
-        const scrollRange = ranges[currentCursor - 1]
-        if (!scrollRange) throw new Error('error updating highlights, scroll range does not exist')
-        const contentEditable = realm.getValue(editorSearchScrollableContent$)
-        scrollToRange(scrollRange, contentEditable!, {
-          ignoreIfInView: true
-        })
-      } else {
-        resetHighlights()
-      }
-    }
-
-    realm.sub(editorSearchTextNodeIndex$, (textNodeIndex) => {
-      updateHighlights(realm.getValue(editorSearchTerm$), textNodeIndex)
+      const editor = realm.getValue(editorSearchActiveEditor$)
+      if (editor) refreshSearch(realm, editor)
     })
 
-    realm.sub(editorSearchTerm$, (searchQuery) => {
-      updateHighlights(searchQuery, realm.getValue(editorSearchTextNodeIndex$))
-    })
-
-    realm.pub(createRootEditorSubscription$, (editor) => {
-      let observer: MutationObserver | null = null
-      return editor.registerRootListener((rootElement) => {
-        if (observer) {
-          observer.disconnect()
-          observer = null
-        }
-        if (rootElement) {
-          //why is this in an array?
-          const initialIndex = indexAllTextNodes(rootElement)
-          realm.pub(editorSearchTextNodeIndex$, initialIndex)
-
-          observer = new MutationObserver(() => {
-            const newIndex = indexAllTextNodes(rootElement)
-            if (realm.getValue(searchOpen$)) {
-              realm.pub(editorSearchTextNodeIndex$, newIndex)
-            } else {
-              //TODO: indexing on every update may be too heavy handed,
-              // an index should only happen when search is made active IF the
-              // the search closeOn on blur is set to true
-              realm.pub(debouncedIndexer$, newIndex)
-            }
-          })
-          observer.observe(rootElement, {
-            childList: true,
-            subtree: true,
-            characterData: true
-          })
-          return () => observer?.disconnect()
-        }
+    realm.pub(createActiveEditorSubscription$, (editor) => {
+      realm.pubIn({
+        [editorSearchActiveEditor$]: editor,
+        [editorSearchTextNodeIndex$]: EmptyTextNodeIndex,
+        [editorSearchScrollableContent$]: editor.getRootElement()?.parentElement ?? null
       })
+      clearSearchResults(realm)
+      refreshSearch(realm, editor)
+
+      const unregisterUpdate = editor.registerUpdateListener(({ dirtyElements, dirtyLeaves }) => {
+        if (dirtyElements.size > 0 || dirtyLeaves.size > 0) refreshSearch(realm, editor)
+      })
+      const unregisterRoot = editor.registerRootListener((rootElement) => {
+        if (!rootElement) {
+          if (realm.getValue(editorSearchActiveEditor$) === editor) {
+            realm.pubIn({
+              [editorSearchTextNodeIndex$]: EmptyTextNodeIndex,
+              [editorSearchScrollableContent$]: null
+            })
+            clearSearchResults(realm)
+          }
+          return
+        }
+
+        realm.pub(editorSearchScrollableContent$, rootElement.parentElement)
+        refreshSearch(realm, editor)
+      })
+
+      return () => {
+        unregisterUpdate()
+        unregisterRoot()
+        if (realm.getValue(editorSearchActiveEditor$) === editor) {
+          realm.pub(editorSearchActiveEditor$, null)
+          clearSearchResults(realm)
+        }
+      }
+    })
+
+    realm.sub(activeEditor$, (editor) => {
+      if (!editor) {
+        realm.pub(editorSearchScrollableContent$, null)
+        clearSearchResults(realm)
+      }
     })
   }
 })
