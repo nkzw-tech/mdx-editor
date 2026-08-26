@@ -5,6 +5,7 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import * as RadixPopover from '@radix-ui/react-popover'
 import {
   $createParagraphNode,
+  $getNodeByKey,
   $getRoot,
   BLUR_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
@@ -15,6 +16,7 @@ import {
   KEY_ENTER_COMMAND,
   KEY_TAB_COMMAND,
   LexicalEditor,
+  type NodeKey,
   createEditor
 } from 'lexical'
 import * as Mdast from 'mdast'
@@ -22,7 +24,7 @@ import React, { ElementType } from 'react'
 import { exportLexicalTreeToMdast } from '../../exportMarkdownFromLexical.js'
 import { importMdastTreeToLexical } from '../../importMarkdownToLexical.js'
 import { lexicalTheme } from '../../styles/lexicalTheme.js'
-import { TableNode } from './TableNode.js'
+import { $isTableNode, TableNode } from './TableNode.js'
 
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { mergeRegister } from '@lexical/utils'
@@ -69,6 +71,11 @@ const AlignToTailwindClassMap = {
   right: styles.rightAlignedCell
 }
 
+function $getTableNodeByKey(key: NodeKey): TableNode | null {
+  const node = $getNodeByKey(key)
+  return $isTableNode(node) ? node : null
+}
+
 export interface TableEditorProps {
   parentEditor: LexicalEditor
   lexicalTable: TableNode
@@ -76,6 +83,7 @@ export interface TableEditorProps {
 }
 
 export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEditor, lexicalTable }) => {
+  const tableKey = lexicalTable.getKey()
   const [activeCell, setActiveCell] = React.useState<[number, number] | null>(null)
   const [readOnly] = useCellValues(readOnly$)
   const getCellKey = React.useMemo(() => {
@@ -110,12 +118,16 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
       if (rowIndex > lexicalTable.getRowCount() - 1) {
         setActiveCell(null)
         parentEditor.update(() => {
-          const nextSibling = lexicalTable.getLatest().getNextSibling()
+          const currentTable = $getTableNodeByKey(tableKey)
+          if (!currentTable) {
+            return
+          }
+          const nextSibling = currentTable.getNextSibling()
           if (nextSibling) {
-            lexicalTable.getLatest().selectNext()
+            currentTable.selectNext()
           } else {
             const newParagraph = $createParagraphNode()
-            lexicalTable.insertAfter(newParagraph)
+            currentTable.insertAfter(newParagraph)
             newParagraph.select()
           }
         })
@@ -125,14 +137,14 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
       if (rowIndex < 0) {
         setActiveCell(null)
         parentEditor.update(() => {
-          lexicalTable.getLatest().selectPrevious()
+          $getTableNodeByKey(tableKey)?.selectPrevious()
         })
         return
       }
 
       setActiveCell([colIndex, rowIndex])
     },
-    [lexicalTable, parentEditor]
+    [lexicalTable, parentEditor, tableKey]
   )
   React.useEffect(() => {
     lexicalTable.focusEmitter.subscribe(setActiveCellWithBoundaries)
@@ -142,11 +154,15 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
     (e: React.MouseEvent) => {
       e.preventDefault()
       parentEditor.update(() => {
-        lexicalTable.addRowToBottom()
-        setActiveCell([0, lexicalTable.getRowCount()])
+        const currentTable = $getTableNodeByKey(tableKey)
+        if (!currentTable) {
+          return
+        }
+        currentTable.addRowToBottom()
+        setActiveCell([0, currentTable.getRowCount()])
       })
     },
-    [parentEditor, lexicalTable]
+    [parentEditor, tableKey]
   )
 
   // adds column to the right and focuses the top cell of it
@@ -154,11 +170,15 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
     (e: React.MouseEvent) => {
       e.preventDefault()
       parentEditor.update(() => {
-        lexicalTable.addColumnToRight()
-        setActiveCell([lexicalTable.getColCount(), 0])
+        const currentTable = $getTableNodeByKey(tableKey)
+        if (!currentTable) {
+          return
+        }
+        currentTable.addColumnToRight()
+        setActiveCell([currentTable.getColCount(), 0])
       })
     },
-    [parentEditor, lexicalTable]
+    [parentEditor, tableKey]
   )
 
   const [highlightedCoordinates, setHighlightedCoordinates] = React.useState<[number, number]>([-1, -1])
@@ -236,8 +256,12 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
                 onClick={(e) => {
                   e.preventDefault()
                   parentEditor.update(() => {
-                    lexicalTable.selectNext()
-                    lexicalTable.remove()
+                    const currentTable = $getTableNodeByKey(tableKey)
+                    if (!currentTable) {
+                      return
+                    }
+                    currentTable.selectNext()
+                    currentTable.remove()
                   })
                 }}
               >
@@ -342,6 +366,7 @@ const Cell: React.FC<Omit<CellProps, 'focus'>> = ({ align, ...props }) => {
 }
 
 const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, lexicalTable, contents, colIndex, rowIndex }) => {
+  const tableKey = lexicalTable.getKey()
   const [
     importVisitors,
     exportVisitors,
@@ -399,16 +424,19 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
         })
         parentEditor.update(
           () => {
-            lexicalTable.updateCellContents(colIndex, rowIndex, (mdast.children[0] as Mdast.Paragraph).children)
+            const currentTable = $getTableNodeByKey(tableKey)
+            if (!currentTable) {
+              return
+            }
+            currentTable.updateCellContents(colIndex, rowIndex, (mdast.children[0] as Mdast.Paragraph).children)
           },
           { discrete: true }
         )
         parentEditor.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined)
       })
-
       setActiveCell(nextCell)
     },
-    [colIndex, editor, exportVisitors, jsxComponentDescriptors, jsxIsAvailable, lexicalTable, parentEditor, rowIndex, setActiveCell]
+    [colIndex, editor, exportVisitors, jsxComponentDescriptors, jsxIsAvailable, parentEditor, rowIndex, setActiveCell, tableKey]
   )
 
   React.useEffect(() => {
@@ -504,34 +532,39 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
   colIndex,
   setActiveCellWithBoundaries
 }) => {
+  const tableKey = lexicalTable.getKey()
   const [editorRootElementRef] = useCellValues(editorRootElementRef$)
 
   const insertColumnAt = React.useCallback(
     (colIndex: number) => {
       parentEditor.update(() => {
-        lexicalTable.insertColumnAt(colIndex)
+        const currentTable = $getTableNodeByKey(tableKey)
+        if (!currentTable) {
+          return
+        }
+        currentTable.insertColumnAt(colIndex)
+        setActiveCellWithBoundaries([colIndex, 0])
       })
-      setActiveCellWithBoundaries([colIndex, 0])
     },
-    [parentEditor, lexicalTable, setActiveCellWithBoundaries]
+    [parentEditor, setActiveCellWithBoundaries, tableKey]
   )
 
   const deleteColumnAt = React.useCallback(
     (colIndex: number) => {
       parentEditor.update(() => {
-        lexicalTable.deleteColumnAt(colIndex)
+        $getTableNodeByKey(tableKey)?.deleteColumnAt(colIndex)
       })
     },
-    [parentEditor, lexicalTable]
+    [parentEditor, tableKey]
   )
 
   const setColumnAlign = React.useCallback(
     (colIndex: number, align: Mdast.AlignType) => {
       parentEditor.update(() => {
-        lexicalTable.setColumnAlign(colIndex, align)
+        $getTableNodeByKey(tableKey)?.setColumnAlign(colIndex, align)
       })
     },
-    [parentEditor, lexicalTable]
+    [parentEditor, tableKey]
   )
 
   const t = useTranslation()
@@ -611,25 +644,30 @@ const RowEditor: React.FC<RowEditorProps> = ({
   rowIndex,
   setActiveCellWithBoundaries
 }) => {
+  const tableKey = lexicalTable.getKey()
   const [editorRootElementRef] = useCellValues(editorRootElementRef$)
 
   const insertRowAt = React.useCallback(
     (rowIndex: number) => {
       parentEditor.update(() => {
-        lexicalTable.insertRowAt(rowIndex)
+        const currentTable = $getTableNodeByKey(tableKey)
+        if (!currentTable) {
+          return
+        }
+        currentTable.insertRowAt(rowIndex)
+        setActiveCellWithBoundaries([0, rowIndex])
       })
-      setActiveCellWithBoundaries([0, rowIndex])
     },
-    [parentEditor, lexicalTable, setActiveCellWithBoundaries]
+    [parentEditor, setActiveCellWithBoundaries, tableKey]
   )
 
   const deleteRowAt = React.useCallback(
     (rowIndex: number) => {
       parentEditor.update(() => {
-        lexicalTable.deleteRowAt(rowIndex)
+        $getTableNodeByKey(tableKey)?.deleteRowAt(rowIndex)
       })
     },
-    [parentEditor, lexicalTable]
+    [parentEditor, tableKey]
   )
 
   const t = useTranslation()
