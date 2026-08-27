@@ -55,6 +55,7 @@ import {
   UnrecognizedMarkdownConstructError,
   importMarkdownToLexical
 } from '../../importMarkdownToLexical.js'
+import { JsxKindMismatchError, type JsxKindMismatchPolicy } from '../jsx/reconcileJsxKind.js'
 import { noop } from '../../utils/fp.js'
 import type { JsxComponentDescriptor } from '../jsx/index.js'
 import { GenericHTMLNode } from './GenericHTMLNode.js'
@@ -289,6 +290,12 @@ export const jsxIsAvailable$ = Cell(false)
  * @group JSX
  */
 export const jsxComponentDescriptors$ = Cell<JsxComponentDescriptor[]>([])
+
+/**
+ * Controls how parsed JSX node kinds are reconciled with component descriptors.
+ * @group JSX
+ */
+export const jsxKindMismatchPolicy$ = Cell<JsxKindMismatchPolicy>('source')
 
 /**
  * Contains the currently registered Markdown directive descriptors.
@@ -689,13 +696,14 @@ function tryImportingMarkdown(r: Realm, node: ImportPoint, markdownValue: string
       markdown: markdownValue,
       syntaxExtensions: r.getValue(syntaxExtensions$),
       jsxComponentDescriptors: r.getValue(jsxComponentDescriptors$),
+      jsxKindMismatchPolicy: r.getValue(jsxKindMismatchPolicy$),
       directiveDescriptors: r.getValue(directiveDescriptors$),
       codeBlockEditorDescriptors: r.getValue(codeBlockEditorDescriptors$),
       defaultCodeBlockLanguage: r.getValue(defaultCodeBlockLanguage$)
     })
     r.pub(markdownProcessingError$, null)
   } catch (e) {
-    if (e instanceof MarkdownParseError || e instanceof UnrecognizedMarkdownConstructError) {
+    if (e instanceof MarkdownParseError || e instanceof UnrecognizedMarkdownConstructError || e instanceof JsxKindMismatchError) {
       r.pubIn({
         [markdown$]: markdownValue,
         [markdownProcessingError$]: {

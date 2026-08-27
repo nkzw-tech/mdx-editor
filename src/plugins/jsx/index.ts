@@ -11,6 +11,7 @@ import {
   addToMarkdownExtension$,
   insertDecoratorNode$,
   jsxComponentDescriptors$,
+  jsxKindMismatchPolicy$,
   jsxIsAvailable$
 } from '../core/index.js'
 import { $createLexicalJsxNode, LexicalJsxNode } from './LexicalJsxNode.js'
@@ -24,6 +25,9 @@ import { MdastMdxExpressionVisitor } from './MdastMdxExpressionVisitor.js'
 import { LexicalMdxExpressionNode } from './LexicalMdxExpressionNode.js'
 import { LexicalMdxExpressionVisitor } from './LexicalMdxExpressionVisitor.js'
 import { GenericJsxEditor } from '../../jsx-editors/GenericJsxEditor.js'
+import type { JsxKindMismatchPolicy } from './reconcileJsxKind.js'
+
+export type { JsxKindMismatchPolicy } from './reconcileJsxKind.js'
 
 /**
  * An MDX JSX MDAST node.
@@ -195,6 +199,11 @@ export interface JsxPluginParams {
    * Whether or not to allow default React fragments <></> processing in MDX.
    */
   allowFragment?: boolean
+  /**
+   * Controls whether the parsed JSX kind or the component descriptor is authoritative when they disagree.
+   * @defaultValue 'source'
+   */
+  kindMismatchPolicy?: JsxKindMismatchPolicy
 }
 
 const fragmentDescriptor = {
@@ -234,11 +243,15 @@ export const jsxPlugin = realmPlugin<JsxPluginParams>({
       [addLexicalNode$]: [LexicalJsxNode, LexicalMdxExpressionNode],
       [addExportVisitor$]: [LexicalJsxVisitor, LexicalMdxExpressionVisitor],
       [addToMarkdownExtension$]: mdxToMarkdown(),
-      [jsxComponentDescriptors$]: getDescriptors(params)
+      [jsxComponentDescriptors$]: getDescriptors(params),
+      [jsxKindMismatchPolicy$]: params?.kindMismatchPolicy ?? 'source'
     })
   },
 
   update(realm, params) {
-    realm.pub(jsxComponentDescriptors$, getDescriptors(params))
+    realm.pubIn({
+      [jsxComponentDescriptors$]: getDescriptors(params),
+      [jsxKindMismatchPolicy$]: params?.kindMismatchPolicy ?? 'source'
+    })
   }
 })
