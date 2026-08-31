@@ -3,9 +3,9 @@ import { describe, expect, it } from 'vitest'
 import type { ElementTransformer, Transformer } from '@lexical/markdown'
 import { HeadingNode } from '@lexical/rich-text'
 import { Realm } from '@mdxeditor/gurx'
-import { composerChildren$ } from '../plugins/core'
-import { headingsPlugin, type HEADING_LEVEL } from '../plugins/headings'
-import { markdownShortcutPlugin } from '../plugins/markdown-shortcut'
+import { composerChildren$ } from '../plugins/core/index.js'
+import { headingsPlugin, type HEADING_LEVEL } from '../plugins/headings/index.js'
+import { markdownShortcutPlugin } from '../plugins/markdown-shortcut/index.js'
 
 function headingShortcutRegExp(allowedHeadingLevels: readonly HEADING_LEVEL[]) {
   const realm = new Realm()

@@ -122,7 +122,7 @@ function createSearchSnapshot(editor: LexicalEditor): SearchSnapshot {
 
       const sourceUnit = String.fromCodePoint(codePoint)
       const normalizedUnit = sourceUnit.normalize('NFKD')
-      const mapsOneToOne = normalizedUnit.length === sourceUnit.length
+      const mapsOneToOne = normalizedUnit === sourceUnit
 
       for (let normalizedOffset = 0; normalizedOffset < normalizedUnit.length; normalizedOffset++) {
         const startOffset = mapsOneToOne ? sourceOffset + normalizedOffset : sourceOffset

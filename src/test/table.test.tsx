@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react'
+import { LexicalComposer } from '@lexical/react/LexicalComposer'
 import { $createParagraphNode, $getRoot, createEditor } from 'lexical'
 import * as Mdast from 'mdast'
 import React from 'react'
@@ -47,24 +48,33 @@ describe('table editor', () => {
     )
 
     render(
-      <RealmWithPlugins
-        plugins={[
-          corePlugin({
-            initialMarkdown: '',
-            contentEditableClassName: '',
-            spellCheck: true,
-            autoFocus: false,
-            onChange: () => undefined,
-            toMarkdownOptions: {},
-            readOnly: false,
-            iconComponentFor: () => <span />,
-            translation: (_key, defaultValue) => defaultValue
-          }),
-          tablePlugin()
-        ]}
+      <LexicalComposer
+        initialConfig={{
+          namespace: 'stale-table-parent-test',
+          onError(error) {
+            throw error
+          }
+        }}
       >
-        <TableEditor lexicalTable={staleTable} mdastNode={tableMdast} parentEditor={parentEditor} />
-      </RealmWithPlugins>
+        <RealmWithPlugins
+          plugins={[
+            corePlugin({
+              initialMarkdown: '',
+              contentEditableClassName: '',
+              spellCheck: true,
+              autoFocus: false,
+              onChange: () => undefined,
+              toMarkdownOptions: {},
+              readOnly: false,
+              iconComponentFor: () => <span />,
+              translation: (_key, defaultValue) => defaultValue
+            }),
+            tablePlugin()
+          ]}
+        >
+          <TableEditor lexicalTable={staleTable} mdastNode={tableMdast} parentEditor={parentEditor} />
+        </RealmWithPlugins>
+      </LexicalComposer>
     )
 
     fireEvent.click(await screen.findByRole('button', { name: 'Delete table' }))

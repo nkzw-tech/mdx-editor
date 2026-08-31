@@ -444,7 +444,7 @@ describe('jsx markdown import export', () => {
     }
   ])('reports an actionable normalization error for $name', async ({ markdown, descriptors }) => {
     const ref = React.createRef<MDXEditorMethods>()
-    const onError = vi.fn<[payload: { error: string; source: string }]>()
+    const onError = vi.fn<(payload: { error: string; source: string }) => void>()
     render(
       <MDXEditor
         ref={ref}
@@ -481,7 +481,7 @@ describe('jsx markdown import export', () => {
     )
     expect(() => reconcileJsxKindMismatches(parseMdx('<Block>\ncontent\n</Block>'), namedDescriptors, 'error')).not.toThrow()
 
-    const onError = vi.fn<[payload: { error: string; source: string }]>()
+    const onError = vi.fn<(payload: { error: string; source: string }) => void>()
     render(
       <MDXEditor
         markdown={'<Block>content</Block>'}
