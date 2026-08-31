@@ -1,0 +1,19 @@
+package.json
+  s_cb06eac6abb735::t_67a370c921e380 47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "cdc42456dd31506b9379c0beca02fda458f84883",
+  "prompts": {},
+  "sessions": {
+    "s_cb06eac6abb735": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a05703-13e7-75b2-a67f-fd48e9f13a1d",
+        "model": "unknown"
+      },
+      "human_author": "Christoph Nakazawa <cnakazawa@cloudflare.com>"
+    }
+  }
+}
