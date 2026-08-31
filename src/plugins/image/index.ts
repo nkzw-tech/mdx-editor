@@ -22,6 +22,7 @@ import {
   LexicalCommand,
   LexicalEditor,
   PASTE_COMMAND,
+  type PasteCommandType,
   createCommand
 } from 'lexical'
 import { realmPlugin } from '../../RealmWithPlugins.js'
@@ -363,9 +364,20 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
         ),
         editor.registerCommand(
           PASTE_COMMAND,
-          (event: ClipboardEvent) => {
+          (event: PasteCommandType) => {
+            const dataTransfer =
+              'clipboardData' in event
+                ? event.clipboardData
+                : 'dataTransfer' in event
+                  ? event.dataTransfer
+                  : null
+
+            if (!dataTransfer) {
+              return false
+            }
+
             if (!theUploadHandler) {
-              let fromWeb = Array.from(event.clipboardData?.items ?? [])
+              let fromWeb = Array.from(dataTransfer.items)
               fromWeb = fromWeb.filter((i) => i.type.includes('text')) // Strip out the non-image bits
 
               if (!fromWeb.length || fromWeb.length === 0) {
@@ -374,7 +386,7 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
               return false // If from web, bail.
             }
 
-            const cbPayload = Array.from(event.clipboardData?.items ?? [])
+            const cbPayload = Array.from(dataTransfer.items)
             const isMixedPayload = cbPayload.some((item) => !item.type.includes('image'))
             if (isMixedPayload) return false
 

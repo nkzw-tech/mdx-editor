@@ -206,12 +206,12 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height, rest }: I
   )
 
   const onEnter = React.useCallback(
-    (event: KeyboardEvent) => {
+    (event: KeyboardEvent | null) => {
       const latestSelection = $getSelection()
       const buttonElem = buttonRef.current
       if (isSelected && $isNodeSelection(latestSelection) && latestSelection.getNodes().length === 1) {
         if (buttonElem !== null && buttonElem !== document.activeElement) {
-          event.preventDefault()
+          event?.preventDefault()
           buttonElem.focus()
           return true
         }

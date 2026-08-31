@@ -52,9 +52,9 @@ export default defineConfig({
     lib: {
       cssFileName: 'styles',
       entry: {
-        core: resolve(__dirname, 'src/core.ts'),
-        index: resolve(__dirname, 'src/index.ts'),
-        persistence: resolve(__dirname, 'src/persistence.ts')
+        core: resolve(import.meta.dirname, 'src/core.ts'),
+        index: resolve(import.meta.dirname, 'src/index.ts'),
+        persistence: resolve(import.meta.dirname, 'src/persistence.ts')
       },
       formats: ['es'],
       fileName: (format, entryName) => {

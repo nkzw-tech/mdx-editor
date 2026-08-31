@@ -10,7 +10,7 @@ export class NotesListItemNode extends ListItemNode {
     return this.config('notes-listitem', { extends: ListItemNode })
   }
 
-  collapseAtStart(selection: RangeSelection): true {
+  collapseAtStart(selection: RangeSelection): boolean {
     const list = this.getParent()
     const shouldRestoreSelection = this.isEmpty() && $isListNode(list) && list.getChildrenSize() > 1
     const result = super.collapseAtStart(selection)
