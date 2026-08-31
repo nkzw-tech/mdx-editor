@@ -1,9 +1,10 @@
-import { $isListNode, ListItemNode } from '@lexical/list'
-import { $isParagraphNode, type RangeSelection } from 'lexical'
+import { $isListItemNode, $isListNode, ListItemNode } from '@lexical/list'
+import type { RangeSelection } from 'lexical'
 
 /**
- * Keeps the caret in the empty paragraph created when the first item is
- * removed from a list that still has other items.
+ * Removes an empty list item into the preceding item when there is one.
+ * Lexical handles first and nested items itself so they can still be
+ * converted to a paragraph or outdented, respectively.
  */
 export class NotesListItemNode extends ListItemNode {
   $config() {
@@ -12,16 +13,19 @@ export class NotesListItemNode extends ListItemNode {
 
   collapseAtStart(selection: RangeSelection): boolean {
     const list = this.getParent()
-    const shouldRestoreSelection = this.isEmpty() && $isListNode(list) && list.getChildrenSize() > 1
-    const result = super.collapseAtStart(selection)
+    const previousItem = this.getPreviousSibling()
 
-    if (shouldRestoreSelection) {
-      const paragraph = list.getPreviousSibling()
-      if ($isParagraphNode(paragraph)) {
-        paragraph.selectStart()
-      }
+    if (
+      this.isEmpty() &&
+      $isListNode(list) &&
+      !$isListItemNode(list.getParent()) &&
+      $isListItemNode(previousItem)
+    ) {
+      this.remove()
+      previousItem.selectEnd()
+      return true
     }
 
-    return result
+    return super.collapseAtStart(selection)
   }
 }

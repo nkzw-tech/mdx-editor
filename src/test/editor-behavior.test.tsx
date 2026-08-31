@@ -14,6 +14,7 @@ import {
   IS_CODE,
   KEY_ARROW_LEFT_COMMAND,
   KEY_ARROW_RIGHT_COMMAND,
+  KEY_BACKSPACE_COMMAND,
   type LexicalEditor,
   UNDO_COMMAND
 } from 'lexical'
@@ -97,6 +98,34 @@ function typeMarkdown(editor: LexicalEditor, markdown: string): void {
     )
   }
   editor.read(() => {})
+}
+
+function pressBackspace(editor: LexicalEditor): KeyboardEvent {
+  const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Backspace' })
+  editor.dispatchCommand(KEY_BACKSPACE_COMMAND, event)
+  editor.read(() => {})
+  return event
+}
+
+function expectSelectionAtTextEnd(editor: LexicalEditor, expectedText: string): void {
+  editor.read(() => {
+    const selection = $getSelection()
+    expect($isRangeSelection(selection)).toBe(true)
+    if (!$isRangeSelection(selection)) {
+      return
+    }
+
+    const anchor = selection.anchor.getNode()
+    const focus = selection.focus.getNode()
+    expect($isTextNode(anchor)).toBe(true)
+    expect($isTextNode(focus)).toBe(true)
+    if ($isTextNode(anchor) && $isTextNode(focus)) {
+      expect(anchor.getTextContent()).toBe(expectedText)
+      expect(focus.getTextContent()).toBe(expectedText)
+      expect(selection.anchor.offset).toBe(expectedText.length)
+      expect(selection.focus.offset).toBe(expectedText.length)
+    }
+  })
 }
 
 describe('inline code boundary navigation', () => {
@@ -380,7 +409,7 @@ describe('markdown shortcut editing', () => {
     expect(ref.current?.getMarkdown()).toBe('first\n\n- second')
   })
 
-  test('keeps the caret in the paragraph created from an empty first bullet', () => {
+  test('Backspace keeps the caret in the paragraph created from an empty first bullet', () => {
     const capture = captureRootEditor()
     const ref = React.createRef<MDXEditorMethods>()
     render(
@@ -405,12 +434,11 @@ describe('markdown shortcut editing', () => {
           if (!$isListItemNode(listItem) || !listItem.isEmpty()) {
             throw new Error('Expected an empty first list item')
           }
-          const selection = listItem.selectStart()
-          listItem.collapseAtStart(selection)
+          listItem.selectStart()
         },
         { discrete: true }
       )
-      editor.read(() => {})
+      expect(pressBackspace(editor).defaultPrevented).toBe(true)
     })
 
     editor.read(() => {
@@ -426,6 +454,177 @@ describe('markdown shortcut editing', () => {
       }
     })
     expect(ref.current?.getMarkdown()).toBe('- second')
+  })
+
+  test('Backspace on an empty first bullet does not move the caret to the preceding paragraph', () => {
+    const capture = captureRootEditor()
+    render(
+      <MDXEditor
+        markdown={'Introduction\n\n-\n- second'}
+        plugins={[listsPlugin(), capture.plugin()]}
+        trim={false}
+      />
+    )
+    const editor = capture.getEditor()
+
+    act(() => {
+      editor.update(
+        () => {
+          const list = $getRoot()
+            .getChildren()
+            .find((node) => $isListNode(node))
+          const listItem = list?.getFirstChild()
+          if (!$isListItemNode(listItem) || !listItem.isEmpty()) {
+            throw new Error('Expected an empty first list item')
+          }
+          listItem.selectStart()
+        },
+        { discrete: true }
+      )
+      expect(pressBackspace(editor).defaultPrevented).toBe(true)
+    })
+
+    editor.read(() => {
+      const root = $getRoot()
+      const emptyParagraph = root.getChildAtIndex(1)
+      const selection = $getSelection()
+      expect(emptyParagraph?.getType()).toBe('paragraph')
+      expect(emptyParagraph?.getTextContent()).toBe('')
+      expect($isRangeSelection(selection)).toBe(true)
+      if ($isRangeSelection(selection) && emptyParagraph) {
+        expect(selection.anchor.key).toBe(emptyParagraph.getKey())
+        expect(selection.focus.key).toBe(emptyParagraph.getKey())
+      }
+    })
+  })
+
+  test('Backspace removes an empty middle bullet and selects the end of the previous bullet', () => {
+    const capture = captureRootEditor()
+    const ref = React.createRef<MDXEditorMethods>()
+    render(
+      <MDXEditor
+        markdown={'- first\n-\n- third'}
+        plugins={[listsPlugin(), capture.plugin()]}
+        ref={ref}
+        toMarkdownOptions={{ bullet: '-' }}
+        trim={false}
+      />
+    )
+    const editor = capture.getEditor()
+
+    act(() => {
+      editor.update(
+        () => {
+          const list = $getRoot().getFirstChild()
+          if (!$isListNode(list)) {
+            throw new Error('Expected a list at the start of the document')
+          }
+          const listItem = list.getChildAtIndex(1)
+          if (!$isListItemNode(listItem) || !listItem.isEmpty()) {
+            throw new Error('Expected an empty middle list item')
+          }
+          listItem.selectStart()
+        },
+        { discrete: true }
+      )
+      expect(pressBackspace(editor).defaultPrevented).toBe(true)
+    })
+
+    expect(ref.current?.getMarkdown()).toBe('- first\n- third')
+    expectSelectionAtTextEnd(editor, 'first')
+  })
+
+  test('Backspace removes an empty final bullet and selects the end of the previous bullet', () => {
+    const capture = captureRootEditor()
+    const ref = React.createRef<MDXEditorMethods>()
+    render(
+      <MDXEditor
+        markdown={
+          'Write a doc on observations.\n\n- Be more ambitious\n- Prototyping\n- DevX lower token usage'
+        }
+        plugins={[listsPlugin(), capture.plugin()]}
+        ref={ref}
+        toMarkdownOptions={{ bullet: '-' }}
+        trim={false}
+      />
+    )
+    const editor = capture.getEditor()
+
+    act(() => {
+      editor.update(
+        () => {
+          const list = $getRoot()
+            .getChildren()
+            .find((node) => $isListNode(node))
+          if (!$isListNode(list)) {
+            throw new Error('Expected a list at the end of the document')
+          }
+          const listItem = list.getLastChild()
+          if (!$isListItemNode(listItem)) {
+            throw new Error('Expected a final list item')
+          }
+          listItem.clear()
+          listItem.selectStart()
+        },
+        { discrete: true }
+      )
+      expect(pressBackspace(editor).defaultPrevented).toBe(true)
+    })
+
+    expect(ref.current?.getMarkdown()).toBe(
+      'Write a doc on observations.\n\n- Be more ambitious\n- Prototyping'
+    )
+    expectSelectionAtTextEnd(editor, 'Prototyping')
+  })
+
+  test('Backspace on an empty nested bullet preserves Lexical outdent behavior', () => {
+    const capture = captureRootEditor()
+    render(
+      <MDXEditor
+        markdown={'- parent\n  - first child\n  - second child\n- after'}
+        plugins={[listsPlugin(), capture.plugin()]}
+        trim={false}
+      />
+    )
+    const editor = capture.getEditor()
+
+    act(() => {
+      editor.update(
+        () => {
+          const outerList = $getRoot().getFirstChild()
+          const nestedWrapper = $isListNode(outerList)
+            ? outerList
+                .getChildren()
+                .find((node) => $isListItemNode(node) && $isListNode(node.getFirstChild()))
+            : null
+          const nestedList = $isListItemNode(nestedWrapper) ? nestedWrapper.getFirstChild() : null
+          const nestedItem = $isListNode(nestedList) ? nestedList.getLastChild() : null
+          if (!$isListNode(nestedList) || !$isListItemNode(nestedItem)) {
+            throw new Error('Expected a nested final list item')
+          }
+          nestedItem.clear()
+          nestedItem.selectStart()
+        },
+        { discrete: true }
+      )
+      expect(pressBackspace(editor).defaultPrevented).toBe(true)
+    })
+
+    editor.read(() => {
+      const outerList = $getRoot().getFirstChild()
+      const outdentedItem = $isListNode(outerList)
+        ? outerList.getChildren().find((node) => $isListItemNode(node) && node.isEmpty())
+        : null
+      const selection = $getSelection()
+      expect($isListNode(outerList)).toBe(true)
+      expect($isListItemNode(outdentedItem)).toBe(true)
+      expect($isListItemNode(outdentedItem) && outdentedItem.isEmpty()).toBe(true)
+      expect($isRangeSelection(selection)).toBe(true)
+      if ($isRangeSelection(selection) && outdentedItem) {
+        expect(selection.anchor.key).toBe(outdentedItem.getKey())
+        expect(selection.focus.key).toBe(outdentedItem.getKey())
+      }
+    })
   })
 })
 
