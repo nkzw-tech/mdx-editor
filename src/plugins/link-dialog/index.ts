@@ -13,6 +13,7 @@ import {
   COMMAND_PRIORITY_LOW,
   KEY_DOWN_COMMAND,
   KEY_ESCAPE_COMMAND,
+  type LexicalEditor,
   type LexicalNode,
   type RangeSelection
 } from 'lexical'
@@ -47,6 +48,8 @@ export interface PreviewLinkDialog {
   type: 'preview'
   title: string
   url: string
+  /** The fail-closed URL used only for automatic preview navigation. */
+  href?: string
   linkNodeKey: string
   rectangle: RectData
 }
@@ -81,6 +84,18 @@ function getLinkNodeInSelection(selection: RangeSelection | null) {
     return node
   }
   return null
+}
+
+function getPreviewHref(editor: LexicalEditor | null, linkNodeKey: string, url: string): string {
+  if (!editor) return 'about:blank'
+
+  return editor.getEditorState().read(() => {
+    const keyedNode = linkNodeKey === '' ? null : $getNodeByKey(linkNodeKey)
+    const selection = $getSelection()
+    const selectedNode = $isRangeSelection(selection) ? getLinkNodeInSelection(selection) : null
+    const linkNode = $isLinkNode(keyedNode) ? keyedNode : selectedNode
+    return linkNode?.sanitizeUrl(url) ?? 'about:blank'
+  })
 }
 
 /**
@@ -209,7 +224,8 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
         linkNodeKey: state.linkNodeKey,
         rectangle: state.rectangle,
         title,
-        url
+        url,
+        href: getPreviewHref(editor, state.linkNodeKey ?? '', url)
       } as PreviewLinkDialog)
     } else {
       if (state.type === 'edit' && state.initialUrl !== '') {
@@ -236,6 +252,7 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
             return {
               type: 'preview' as const,
               url: state.initialUrl,
+              href: getPreviewHref(editor, state.linkNodeKey, state.initialUrl),
               linkNodeKey: state.linkNodeKey,
               rectangle: state.rectangle
             } as PreviewLinkDialog
@@ -266,6 +283,7 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
             return {
               type: 'preview',
               url: node.getURL(),
+              href: node.sanitizeUrl(node.getURL()),
               linkNodeKey: node.getKey(),
               title: node.getTitle(),
               rectangle: rect

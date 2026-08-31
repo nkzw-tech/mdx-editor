@@ -69,10 +69,9 @@ export class CodeBlockNode extends DecoratorNode<JSX.Element> {
   }
 
   static importJSON(serializedNode: SerializedLexicalNode & Record<string, unknown>): CodeBlockNode {
-    const { code, meta, language } = serializedNode
-    if (typeof code !== 'string' || typeof meta !== 'string' || typeof language !== 'string') {
-      throw new TypeError('Invalid serialized code block node')
-    }
+    const code = typeof serializedNode.code === 'string' ? serializedNode.code : ''
+    const language = typeof serializedNode.language === 'string' ? serializedNode.language : ''
+    const meta = typeof serializedNode.meta === 'string' ? serializedNode.meta : ''
     return $createCodeBlockNode({
       code,
       language,
