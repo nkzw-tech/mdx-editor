@@ -44,6 +44,7 @@
     "build": "vite build",
     "check": "pnpm typecheck && pnpm test && pnpm build",
     "prepare": "pnpm build",
+    "ship": "pnpm check && pnpm publish --access public",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
