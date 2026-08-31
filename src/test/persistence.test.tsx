@@ -62,7 +62,8 @@ const deferred = <Value,>() => {
 }
 
 const renderPersistentEditor = async (
-  documentToRender: TestDocument = initialDocument
+  documentToRender: TestDocument = initialDocument,
+  lifecycleFlush = false
 ) => {
   const container = document.createElement('div')
   const root = createRoot(container)
@@ -79,7 +80,7 @@ const renderPersistentEditor = async (
       <PersistentMarkdownEditor
         adapter={adapter}
         document={documentToRender}
-        lifecycleFlush={false}
+        lifecycleFlush={lifecycleFlush}
         onDocumentChange={onDocumentChange}
         onLocalChange={onLocalChange}
         onStatusChange={onStatusChange}
@@ -278,5 +279,76 @@ describe('PersistentMarkdownEditor', () => {
     )
     await act(async () => rendered.root.unmount())
   })
-})
 
+  test('carries lifecycle keepalive through an older in-flight save', async () => {
+    const pendingSave = deferred<{
+      document: TestDocument
+      status: 'saved'
+    }>()
+    const firstDocument: TestDocument = {
+      content: 'First draft\n',
+      id: 'docs/test.md',
+      path: 'docs/test.md',
+      version: 'first-version'
+    }
+    const latestDocument: TestDocument = {
+      content: 'Latest draft\n',
+      id: 'docs/test.md',
+      path: 'docs/test.md',
+      version: 'latest-version'
+    }
+    const rendered = await renderPersistentEditor(initialDocument, true)
+    rendered.adapter.save
+      .mockReturnValueOnce(pendingSave.promise)
+      .mockResolvedValueOnce({
+        document: latestDocument,
+        status: 'saved'
+      })
+
+    act(() => rendered.props.onChange?.('First draft'))
+    const firstFlush = rendered.ref.current!.flush()
+    expect(rendered.adapter.save).toHaveBeenCalledTimes(1)
+
+    act(() => {
+      rendered.props.onChange?.('Latest draft')
+      window.dispatchEvent(new Event('pagehide'))
+    })
+    expect(rendered.adapter.save).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      pendingSave.resolve({ document: firstDocument, status: 'saved' })
+      await firstFlush
+    })
+
+    expect(rendered.adapter.save).toHaveBeenCalledTimes(2)
+    expect(rendered.adapter.save).toHaveBeenLastCalledWith({
+      content: 'Latest draft\n',
+      document: firstDocument,
+      keepalive: true
+    })
+    await act(async () => rendered.root.unmount())
+  })
+
+  test('flushes unsaved text with keepalive when unmounted', async () => {
+    const storedDocument: TestDocument = {
+      content: 'Unsaved draft\n',
+      id: 'docs/test.md',
+      path: 'docs/test.md',
+      version: 'saved-version'
+    }
+    const rendered = await renderPersistentEditor(initialDocument, true)
+    rendered.adapter.save.mockResolvedValue({
+      document: storedDocument,
+      status: 'saved'
+    })
+
+    act(() => rendered.props.onChange?.('Unsaved draft'))
+    await act(async () => rendered.root.unmount())
+
+    expect(rendered.adapter.save).toHaveBeenCalledWith({
+      content: 'Unsaved draft\n',
+      document: initialDocument,
+      keepalive: true
+    })
+  })
+})

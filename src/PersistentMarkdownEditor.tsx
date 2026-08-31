@@ -73,6 +73,7 @@ type SaveSession<Document extends MarkdownDocument> = {
   document: Document
   inFlight: Promise<boolean> | null
   inFlightContent: string | null
+  lifecycleKeepalive: boolean
   latestContent: string
   maxWaitTimer: ReturnType<typeof setTimeout> | null
   savedContent: string
@@ -137,6 +138,7 @@ function PersistentMarkdownEditorInner<Document extends MarkdownDocument>(
     document,
     inFlight: null,
     inFlightContent: null,
+    lifecycleKeepalive: false,
     latestContent: initialContent,
     maxWaitTimer: null,
     savedContent: initialContent,
@@ -232,6 +234,9 @@ function PersistentMarkdownEditorInner<Document extends MarkdownDocument>(
   }
 
   const flush = async ({ keepalive = false } = {}) => {
+    if (keepalive) {
+      sessionRef.current.lifecycleKeepalive = true
+    }
     clearSaveTimers()
     const session = sessionRef.current
 
@@ -245,7 +250,9 @@ function PersistentMarkdownEditorInner<Document extends MarkdownDocument>(
         }
         continue
       }
-      if (!(await saveOnce(keepalive))) {
+      const saveWithKeepalive = keepalive || session.lifecycleKeepalive
+      session.lifecycleKeepalive = false
+      if (!(await saveOnce(saveWithKeepalive))) {
         return false
       }
     }
@@ -253,6 +260,7 @@ function PersistentMarkdownEditorInner<Document extends MarkdownDocument>(
     if (session.inFlight) {
       return session.inFlight
     }
+    session.lifecycleKeepalive = false
     setStatus('saved')
     return true
   }
@@ -362,6 +370,7 @@ function PersistentMarkdownEditorInner<Document extends MarkdownDocument>(
       session.document = document
       session.inFlight = null
       session.inFlightContent = null
+      session.lifecycleKeepalive = false
       session.latestContent = nextContent
       session.savedContent = nextContent
       setConflictDocument(null)
@@ -408,7 +417,11 @@ function PersistentMarkdownEditorInner<Document extends MarkdownDocument>(
       )
       window.removeEventListener('beforeunload', onBeforeUnload)
       window.removeEventListener('pagehide', onPageHide)
-      clearSaveTimers()
+      if (hasUnsavedChanges()) {
+        void flush({ keepalive: true })
+      } else {
+        clearSaveTimers()
+      }
     }
   }, [lifecycleFlush])
 
