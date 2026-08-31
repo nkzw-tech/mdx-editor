@@ -1,0 +1,19 @@
+UPSTREAM.md
+  s_cb06eac6abb735::t_853a3eed673dbe 5-9,12-34,37-38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "e76db2a04855f19fd21681ae6000bec011806871",
+  "prompts": {},
+  "sessions": {
+    "s_cb06eac6abb735": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a05703-13e7-75b2-a67f-fd48e9f13a1d",
+        "model": "unknown"
+      },
+      "human_author": "Christoph Nakazawa <cnakazawa@cloudflare.com>"
+    }
+  }
+}
