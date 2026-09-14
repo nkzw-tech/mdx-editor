@@ -28,7 +28,6 @@ import {
 import { $isRootOrShadowRoot, LexicalCommand, RangeSelection } from 'lexical'
 import { $getListDepth, $isListItemNode, $isListNode } from '@lexical/list'
 import { $getSelection, $isElementNode, $isRangeSelection, COMMAND_PRIORITY_CRITICAL, ElementNode, INDENT_CONTENT_COMMAND } from 'lexical'
-import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin.js'
 import { ListPlugin } from '@lexical/react/LexicalListPlugin.js'
 
 import { $findMatchingParent, $getNearestNodeOfType } from '@lexical/utils'
@@ -39,6 +38,7 @@ import { Cell, Signal, withLatestFrom } from '@mdxeditor/gurx'
 import { realmPlugin } from '../../RealmWithPlugins.js'
 import { NotesListItemNode } from './NotesListItemNode.js'
 import { CheckListPlugin } from './CheckListPlugin.js'
+import { ListTabIndentationPlugin } from './ListTabIndentationPlugin.js'
 
 const listItemNodeReplacement = {
   replace: ListItemNode,
@@ -115,8 +115,8 @@ export const listsPlugin = realmPlugin({
       [addLexicalNode$]: [NotesListItemNode, listItemNodeReplacement, ListNode],
       [addExportVisitor$]: [LexicalListVisitor, LexicalListItemVisitor],
       [addToMarkdownExtension$]: gfmTaskListItemToMarkdown(),
-      [addComposerChild$]: [TabIndentationPlugin, ListPlugin, CheckListPlugin],
-      [addNestedEditorChild$]: [TabIndentationPlugin, ListPlugin, CheckListPlugin]
+      [addComposerChild$]: [ListTabIndentationPlugin, ListPlugin, CheckListPlugin],
+      [addNestedEditorChild$]: [ListTabIndentationPlugin, ListPlugin, CheckListPlugin]
       // Note: intentionally not registered to addTableCellEditorChild$ — lists are not supported in table cells
     })
   }

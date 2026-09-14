@@ -15,6 +15,7 @@ import {
   KEY_ARROW_LEFT_COMMAND,
   KEY_ARROW_RIGHT_COMMAND,
   KEY_BACKSPACE_COMMAND,
+  KEY_TAB_COMMAND,
   type LexicalEditor,
   UNDO_COMMAND
 } from 'lexical'
@@ -103,6 +104,13 @@ function typeMarkdown(editor: LexicalEditor, markdown: string): void {
 function pressBackspace(editor: LexicalEditor): KeyboardEvent {
   const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Backspace' })
   editor.dispatchCommand(KEY_BACKSPACE_COMMAND, event)
+  editor.read(() => {})
+  return event
+}
+
+function pressTab(editor: LexicalEditor, shiftKey = false): KeyboardEvent {
+  const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Tab', shiftKey })
+  editor.dispatchCommand(KEY_TAB_COMMAND, event)
   editor.read(() => {})
   return event
 }
@@ -407,6 +415,82 @@ describe('markdown shortcut editing', () => {
     })
 
     expect(ref.current?.getMarkdown()).toBe('first\n\n- second')
+  })
+
+  test('Tab and Shift+Tab indent and outdent a list item from any caret offset', () => {
+    const capture = captureRootEditor()
+    const ref = React.createRef<MDXEditorMethods>()
+    render(
+      <MDXEditor
+        markdown={'- first\n- second'}
+        plugins={[listsPlugin(), capture.plugin()]}
+        ref={ref}
+        toMarkdownOptions={{ bullet: '-' }}
+      />
+    )
+    const editor = capture.getEditor()
+
+    act(() => {
+      editor.update(
+        () => {
+          const secondText = $getRoot()
+            .getAllTextNodes()
+            .find((node) => node.getTextContent() === 'second')
+          if (!secondText) {
+            throw new Error('Expected second list item text')
+          }
+          secondText.select(3, 3)
+        },
+        { discrete: true }
+      )
+      expect(pressTab(editor).defaultPrevented).toBe(true)
+    })
+
+    expect(ref.current?.getMarkdown()).toBe('- first\n  - second')
+
+    act(() => {
+      expect(pressTab(editor, true).defaultPrevented).toBe(true)
+    })
+
+    expect(ref.current?.getMarkdown()).toBe('- first\n- second')
+  })
+
+  test('Tab and Shift+Tab indent and outdent task list items', () => {
+    const capture = captureRootEditor()
+    const ref = React.createRef<MDXEditorMethods>()
+    render(
+      <MDXEditor
+        markdown={'- [ ] first\n- [ ] second'}
+        plugins={[listsPlugin(), capture.plugin()]}
+        ref={ref}
+        toMarkdownOptions={{ bullet: '-' }}
+      />
+    )
+    const editor = capture.getEditor()
+
+    act(() => {
+      editor.update(
+        () => {
+          const secondText = $getRoot()
+            .getAllTextNodes()
+            .find((node) => node.getTextContent() === 'second')
+          if (!secondText) {
+            throw new Error('Expected second task list item text')
+          }
+          secondText.select(3, 3)
+        },
+        { discrete: true }
+      )
+      expect(pressTab(editor).defaultPrevented).toBe(true)
+    })
+
+    expect(ref.current?.getMarkdown()).toBe('- [ ] first\n  - [ ] second')
+
+    act(() => {
+      expect(pressTab(editor, true).defaultPrevented).toBe(true)
+    })
+
+    expect(ref.current?.getMarkdown()).toBe('- [ ] first\n- [ ] second')
   })
 
   test('Backspace keeps the caret in the paragraph created from an empty first bullet', () => {
