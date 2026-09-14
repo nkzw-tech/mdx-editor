@@ -1,0 +1,23 @@
+src/plugins/lists/ListTabIndentationPlugin.tsx
+  s_d5e5104ac53e6a::t_072da31d0ee832 1-46
+src/plugins/lists/index.ts
+  s_d5e5104ac53e6a::t_aa289af3d3e3ab 41,118-119
+src/test/editor-behavior.test.tsx
+  s_d5e5104ac53e6a::t_2c25769a4df208 18,111-117,420-495
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "c2685be3ef5f90688f8045c0284a771075671c82",
+  "prompts": {},
+  "sessions": {
+    "s_d5e5104ac53e6a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a098d7-8769-7151-9d39-9bddba6b8dfa",
+        "model": "unknown"
+      },
+      "human_author": "Christoph Nakazawa <cnakazawa@cloudflare.com>"
+    }
+  }
+}
