@@ -250,6 +250,12 @@
   padding-left: 20px;
 }
 
+/* Nested rows use list-item spacing so indenting does not change vertical gaps. */
+.mdx-editor .mdx-editor-content li > ul,
+.mdx-editor .mdx-editor-content li > ol {
+  margin-block: 0;
+}
+
 .mdx-editor-content li {
   margin: 0;
   padding-left: 2px;
